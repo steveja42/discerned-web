@@ -1,17 +1,16 @@
+// Private Reading Room — shows clips delivered from the Discerned extension via postMessage.
+// Renders a folder sidebar, clip list, and detail panel. If the bridge times out (2s)
+// with no extension present, shows ReadingRoomEmpty with the install prompt instead.
+
 'use client';
 
 import { useState, useMemo } from 'react';
 import { useReadingRoomBridge } from '@/hooks/useReadingRoomBridge';
 import { CATEGORIES, INTEREST_LEVELS } from '@/lib/constants';
-import type { ClipData } from '@/lib/types';
 import type { GlyphVariant } from '@/components/glyph/Glyph';
 import ClipRow from '@/components/feed/ClipRow';
 import DetailPanel from '@/components/feed/DetailPanel';
 import ReadingRoomEmpty from './ReadingRoomEmpty';
-
-function domainOf(url: string): string {
-  try { return new URL(url).hostname.replace(/^www\./, ''); } catch { return url; }
-}
 
 interface SidebarLocalProps {
   activeCat: string | null;

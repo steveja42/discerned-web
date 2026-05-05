@@ -1,3 +1,7 @@
+// Concentric arc-ring SVG glyph — an alternate evaluation display.
+// Outer ring = Interest arc, inner ring = Ethics arc.
+// Centre dot colour matches the category hue. Used when glyphVariant='radial'.
+
 import { CATEGORIES, interestRank, ethicsRank } from '@/lib/constants';
 
 interface GlyphRadialProps {

@@ -1,7 +1,10 @@
+// Main public Cast feed shell — the home page's primary content area.
+// Owns all filter state (category, interest/ethics minimums, active follow) and
+// derives the filtered clip list. Renders the three-column layout: Sidebar / feed list / DetailPanel.
+
 'use client';
 
 import { useState, useMemo } from 'react';
-import { useCastFeed } from '@/hooks/useCastFeed';
 import { CATEGORIES, INTEREST_LEVELS, ETHICS_LEVELS, interestRank, ethicsRank } from '@/lib/constants';
 import { FOLLOWS } from '@/lib/mockData';
 import type { ClipData } from '@/lib/types';
@@ -10,6 +13,7 @@ import ClipRow from './ClipRow';
 import DetailPanel from './DetailPanel';
 import FilterStrip from './FilterStrip';
 
+// Left sidebar: View shortcuts, follows list, and axis/category filter controls.
 interface SidebarProps {
   activeCat: string | null;
   setActiveCat: (c: string | null) => void;
@@ -20,7 +24,6 @@ interface SidebarProps {
   activeFollow: string;
   setActiveFollow: (f: string) => void;
   count: number;
-  catCounts: Record<string, number>;
 }
 
 function Sidebar({
@@ -28,7 +31,7 @@ function Sidebar({
   interestMin, setInterestMin,
   ethicsMin, setEthicsMin,
   activeFollow, setActiveFollow,
-  count, catCounts,
+  count,
 }: SidebarProps) {
   return (
     <aside className="sidebar">
@@ -183,12 +186,6 @@ export default function CastFeed({ glyphVariant = 'bars', status, clips }: CastF
 
   const selected = filtered.find((c) => c.capture.id === selectedId) ?? filtered[0] ?? null;
 
-  const catCounts = useMemo(() => {
-    const m: Record<string, number> = {};
-    clips.forEach((c) => { m[c.evaluation.category] = (m[c.evaluation.category] ?? 0) + 1; });
-    return m;
-  }, [clips]);
-
   return (
     <div className="app">
       <div className="main">
@@ -198,7 +195,6 @@ export default function CastFeed({ glyphVariant = 'bars', status, clips }: CastF
           ethicsMin={ethicsMin} setEthicsMin={setEthicsMin}
           activeFollow={activeFollow} setActiveFollow={setActiveFollow}
           count={clips.length}
-          catCounts={catCounts}
         />
 
         <main className="feed-col">

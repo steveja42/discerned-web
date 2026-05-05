@@ -1,3 +1,7 @@
+// Topbar avatar button reflecting the current auth status.
+// Guest shows "N" (Nostr); connected/readonly shows the first two chars of the pubkey.
+// Clicking always opens the sign-in modal regardless of current status.
+
 'use client';
 
 import type { AuthState } from '@/lib/types';

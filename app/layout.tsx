@@ -1,3 +1,6 @@
+// Root layout — applies the Editorial design system body class and project metadata.
+// All pages share this shell; no navigation chrome is rendered here (TopBar lives per-page).
+
 import type { Metadata } from 'next';
 import './globals.css';
 

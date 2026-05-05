@@ -1,3 +1,7 @@
+// Nostr relay subscription for the public Cast feed.
+// Subscribes to kind:1 events tagged #discerned across the default relay set.
+// Returns a cleanup function that closes the subscription and pool on unmount.
+
 import { SimplePool, type Event, type Filter } from 'nostr-tools';
 import { DEFAULT_RELAYS } from '@/lib/constants';
 

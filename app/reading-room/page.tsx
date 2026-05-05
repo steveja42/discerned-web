@@ -1,3 +1,6 @@
+// /reading-room page — displays the user's private clips delivered from the extension.
+// Renders TopBar and ReadingRoom; clips arrive via the postMessage bridge, not Nostr.
+
 'use client';
 
 import { useState } from 'react';

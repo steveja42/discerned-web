@@ -1,3 +1,7 @@
+// Client root for the home page (/). Wires together auth state, the live Cast feed,
+// the first-visit popover, and the sign-in modal. Brand clicks dismiss the popover
+// and navigate to /about.
+
 'use client';
 
 import { useState } from 'react';
@@ -12,7 +16,7 @@ import { useCastFeed } from '@/hooks/useCastFeed';
 
 export default function HomeClient() {
   const router = useRouter();
-  const { auth, signInNip07, signInPubkey } = useNostrAuth();
+  const { auth, signInPubkey } = useNostrAuth();
   const { showPopover, dismiss: dismissPopover } = useFirstVisit();
   const { clips, status } = useCastFeed();
   const [signInOpen, setSignInOpen] = useState(false);

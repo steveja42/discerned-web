@@ -1,7 +1,10 @@
+// Welcome popover anchored below the TopBar brand mark, shown on the first visit.
+// Dismisses on outside pointerdown (listener deferred one tick to avoid the mount
+// click triggering it immediately) or via the explicit action buttons.
+
 'use client';
 
 import { useEffect, useRef } from 'react';
-import Link from 'next/link';
 
 interface FirstVisitPopoverProps {
   onDismiss: () => void;

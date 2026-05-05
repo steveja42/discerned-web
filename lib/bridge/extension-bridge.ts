@@ -1,3 +1,8 @@
+// Origin-pinned postMessage bridge between the Discerned Chrome extension and this page.
+// The extension content script runs on discerned.online/* and announces itself with
+// DISCERNED_BRIDGE_HELLO then pushes clips via DISCERNED_BRIDGE_CLIPS.
+// On mount, the page posts DISCERNED_WEB_READY so the extension knows it can send.
+
 import type { ClipData } from '@/lib/types';
 
 export type BridgeMessage =

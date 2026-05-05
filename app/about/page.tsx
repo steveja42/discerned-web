@@ -1,3 +1,6 @@
+// Static server-rendered About page. Renders the HeroBeacon illustration,
+// product pitch copy, and philosophy sections. No client JS required.
+
 import Link from 'next/link';
 import HeroBeacon from '@/components/brand/HeroBeacon';
 

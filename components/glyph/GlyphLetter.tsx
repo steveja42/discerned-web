@@ -1,3 +1,6 @@
+// Compact mono-label pill glyph — shows truncated level names for Interest and Ethics.
+// Used when glyphVariant='letter'. Suits dense layouts where bar/arc glyphs are too wide.
+
 import { CATEGORIES } from '@/lib/constants';
 
 interface GlyphLetterProps {

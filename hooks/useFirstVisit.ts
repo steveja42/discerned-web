@@ -1,3 +1,7 @@
+// Controls whether the first-visit welcome popover is shown.
+// State is derived from localStorage["discerned.seenHero"] — present means dismissed.
+// Calling dismiss() hides the popover and writes the flag so it never shows again.
+
 'use client';
 
 import { useState, useCallback } from 'react';

@@ -1,3 +1,5 @@
+// Custom 404 page matching the Editorial design system.
+
 import Link from 'next/link';
 
 export default function NotFound() {

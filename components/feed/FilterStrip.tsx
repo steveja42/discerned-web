@@ -1,3 +1,6 @@
+// Active filter pill bar rendered below the feed header when any filter is set.
+// Returns null when no filters are active so it takes up no layout space.
+
 'use client';
 
 import { INTEREST_LEVELS, ETHICS_LEVELS } from '@/lib/constants';

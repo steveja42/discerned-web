@@ -1,3 +1,8 @@
+// Listens for the Discerned extension bridge on the /reading-room page.
+// Sets bridgePresent when DISCERNED_BRIDGE_HELLO arrives and populates clips
+// from DISCERNED_BRIDGE_CLIPS. After 2 seconds without a HELLO, sets timedOut
+// so the page can show the extension install prompt instead of a spinner.
+
 'use client';
 
 import { useState, useEffect } from 'react';

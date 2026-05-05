@@ -1,3 +1,8 @@
+// Converts a raw Nostr kind:1 event into the app's ClipData shape.
+// Discerned events use `l` tags with namespaced values for the three axes
+// (online.discerned.interest / ethics / category), `r` for the source URL,
+// and `quote` for the clipped selection text.
+
 import type { Event } from 'nostr-tools';
 import type { ClipData, ClipFormat, InterestLevel, EthicsLevel } from '@/lib/types';
 

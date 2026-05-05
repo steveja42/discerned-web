@@ -1,3 +1,8 @@
+// Manages the live Nostr Cast feed subscription.
+// Pre-seeds the list with MOCK_CLIPS while the relay connection establishes,
+// then deduplicates and prepends incoming events up to a cap of 200.
+// Feed and parse modules are dynamically imported so they never run server-side.
+
 'use client';
 
 import { useState, useEffect } from 'react';

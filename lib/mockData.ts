@@ -1,3 +1,6 @@
+// Seed data shown in the Cast feed while the Nostr relay connection is establishing.
+// Also used as placeholder follows in the sidebar. Not persisted anywhere.
+
 import type { ClipData } from '@/lib/types';
 
 export const MOCK_CLIPS: ClipData[] = [

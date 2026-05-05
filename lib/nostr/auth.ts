@@ -1,3 +1,7 @@
+// Client-side Nostr auth helpers. Three sign-in paths are supported:
+// NIP-07 browser extension (window.nostr), pasted nsec, or generated keypair.
+// Only the public key is ever persisted — to localStorage["discerned.auth"].
+
 declare global {
   interface Window {
     nostr?: {

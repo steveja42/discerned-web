@@ -1,3 +1,8 @@
+// Three-step sign-in modal: NIP-07 browser extension, paste nsec, or generate new keypair.
+// Only the public key is ever stored (via storePubkey). The nsec is decoded in memory only
+// and never persisted. The generated keypair flow requires the user to explicitly confirm
+// they have backed up their key before continuing.
+
 'use client';
 
 import { useState } from 'react';

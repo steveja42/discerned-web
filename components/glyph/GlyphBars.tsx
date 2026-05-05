@@ -1,3 +1,7 @@
+// Horizontal bar-meter glyph — the default clip evaluation display.
+// Renders Interest (5 segments) and Ethics (6 segments) as filled pip rows,
+// plus a colour-coded category chip derived from the CATEGORIES hue map.
+
 import { CATEGORIES, interestRank, ethicsRank } from '@/lib/constants';
 
 interface GlyphBarsProps {

@@ -1,3 +1,7 @@
+// Dispatcher component that renders one of three axis visualisation styles.
+// 'bars' is the default compact row view; 'radial' uses SVG arcs; 'letter' uses mono pills.
+// The variant is set at the feed level and passed down through ClipRow.
+
 import GlyphBars from './GlyphBars';
 import GlyphRadial from './GlyphRadial';
 import GlyphLetter from './GlyphLetter';

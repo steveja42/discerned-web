@@ -1,3 +1,7 @@
+// Full-width 800×400 hero illustration used on the About page.
+// Includes radial sky gradient, scattered noise marks, fanned ray polygons, and the beacon tower.
+// Colours are hardcoded to the Editorial palette — do not replace with a raster image.
+
 export default function HeroBeacon() {
   const bg1 = '#f6f1e8';
   const bg2 = '#efe4cc';

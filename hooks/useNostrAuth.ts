@@ -1,3 +1,8 @@
+// Global Nostr authentication state for the app.
+// On mount, restores a previously stored pubkey from localStorage.
+// Exposes sign-in methods for NIP-07, pubkey-only (read-only), and bridge auth.
+// Bridge auth never upgrades an already-connected session.
+
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';

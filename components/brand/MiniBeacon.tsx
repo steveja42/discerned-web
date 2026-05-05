@@ -1,3 +1,7 @@
+// Hand-authored SVG of the Discerned beacon tower — used in the TopBar brand mark.
+// Renders in currentColor so it inherits the text colour of its container.
+// Do not replace with an icon library icon; this SVG is load-bearing for brand identity.
+
 interface MiniBeaconProps {
   size?: number;
 }

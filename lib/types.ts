@@ -1,3 +1,7 @@
+// Shared domain types mirroring the Discerned Chrome extension's data model.
+// ClipData is the canonical unit of information flowing through both the extension
+// bridge (postMessage) and the public Nostr cast feed.
+
 export type ClipFormat = 'selection' | 'article' | 'simplified-article' | 'full-page' | 'bookmark';
 export type InterestLevel = 'Noise' | 'Neutral' | 'Interesting' | 'Insightful' | 'Wise';
 export type EthicsLevel = 'Malicious' | 'Misleading' | 'Biased' | 'Neutral' | 'Honest' | 'Exemplary';

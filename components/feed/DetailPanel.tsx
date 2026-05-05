@@ -1,3 +1,6 @@
+// Right-rail detail panel — renders the selected clip's full excerpt, axis track bars,
+// category swatch, and action buttons. Shows a placeholder when no clip is selected.
+
 'use client';
 
 import type { ClipData } from '@/lib/types';

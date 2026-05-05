@@ -1,3 +1,6 @@
+// Axis vocabularies and category definitions shared across feed, glyphs, and filters.
+// Hue values drive oklch() colour generation for category swatches in the UI.
+
 export const INTEREST_LEVELS = ['Noise', 'Neutral', 'Interesting', 'Insightful', 'Wise'] as const;
 export const ETHICS_LEVELS = ['Malicious', 'Misleading', 'Biased', 'Neutral', 'Honest', 'Exemplary'] as const;
 

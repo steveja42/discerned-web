@@ -1,3 +1,6 @@
+// Empty state shown in /reading-room when no extension bridge is detected after 2 seconds.
+// Prompts the user to install the Discerned Chrome extension to populate their Reading Room.
+
 import Link from 'next/link';
 
 export default function ReadingRoomEmpty() {

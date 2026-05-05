@@ -1,3 +1,7 @@
+// Sticky application topbar with brand mark, search input, nav links, and auth avatar.
+// When brandHasPopover is true, the beacon pulses to draw attention to the first-visit popover.
+// onBrandClick is wired by HomeClient to dismiss the popover and navigate to /about.
+
 'use client';
 
 import Link from 'next/link';
