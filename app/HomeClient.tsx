@@ -25,7 +25,7 @@ export default function HomeClient() {
 
   const handleBrandClick = () => {
     dismissPopover();
-    router.push('/about');
+    router.push('/');
   };
 
   const handleLearnMore = () => {

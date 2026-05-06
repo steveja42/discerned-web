@@ -12,6 +12,7 @@ import type { GlyphVariant } from '@/components/glyph/Glyph';
 import ClipRow from './ClipRow';
 import DetailPanel from './DetailPanel';
 import FilterStrip from './FilterStrip';
+import ResizableLayout from '@/components/layout/ResizableLayout';
 
 // Left sidebar: View shortcuts, follows list, and axis/category filter controls.
 interface SidebarProps {
@@ -186,78 +187,84 @@ export default function CastFeed({ glyphVariant = 'bars', status, clips }: CastF
 
   const selected = filtered.find((c) => c.capture.id === selectedId) ?? filtered[0] ?? null;
 
+  const feedContent = (
+    <main className="feed-col">
+      <div className="feed-head">
+        <div>
+          <h1 className="feed-title"><em>Discernments</em></h1>
+          <div className="feed-meta">
+            {filtered.length} clips
+            <span className="sep">·</span>
+            live · Nostr
+            <span className="sep">·</span>
+            {status === 'connecting' ? 'connecting…' : status === 'live' ? 'live' : 'error'}
+          </div>
+        </div>
+        <div className="feed-controls">
+          <button className="sort">Sort: Recent <Icon name="chevdown" /></button>
+          <div className="density">
+            <button className="active"><Icon name="list" /></button>
+            <button><Icon name="grid" /></button>
+          </div>
+        </div>
+      </div>
+
+      <FilterStrip
+        interestMin={interestMin}
+        ethicsMin={ethicsMin}
+        activeCat={activeCat}
+        onClearInterest={() => setInterestMin(0)}
+        onClearEthics={() => setEthicsMin(0)}
+        onClearCat={() => setActiveCat(null)}
+        onClearAll={() => { setInterestMin(0); setEthicsMin(0); setActiveCat(null); setActiveFollow('all'); }}
+      />
+
+      <div className="feed-list">
+        {filtered.length === 0 ? (
+          <div className="feed-empty">No clips match these filters.</div>
+        ) : (
+          filtered.map((clip) => (
+            <ClipRow
+              key={clip.capture.id}
+              clip={clip}
+              selected={selected?.capture.id === clip.capture.id}
+              onClick={() => setSelectedId(clip.capture.id)}
+              glyphVariant={glyphVariant}
+            />
+          ))
+        )}
+      </div>
+
+      <div className="sov-strip">
+        <span className="item"><span className="ok-dot" />Local-first · IndexedDB</span>
+        <span className="item"><span className="pulse-dot" />Connected to <span className="relay-count">3 relays</span></span>
+        <span className="item">
+          <Icon name="github" /> Extension on GitHub
+        </span>
+        <span className="spacer" />
+        <span className="item"><a>Export NIP-23</a></span>
+        <span className="item"><a>Public key visible</a></span>
+      </div>
+    </main>
+  );
+
   return (
     <div className="app">
-      <div className="main">
-        <Sidebar
-          activeCat={activeCat} setActiveCat={setActiveCat}
-          interestMin={interestMin} setInterestMin={setInterestMin}
-          ethicsMin={ethicsMin} setEthicsMin={setEthicsMin}
-          activeFollow={activeFollow} setActiveFollow={setActiveFollow}
-          count={clips.length}
-        />
-
-        <main className="feed-col">
-          <div className="feed-head">
-            <div>
-              <h1 className="feed-title"><em>Discernments</em></h1>
-              <div className="feed-meta">
-                {filtered.length} clips
-                <span className="sep">·</span>
-                live · Nostr
-                <span className="sep">·</span>
-                {status === 'connecting' ? 'connecting…' : status === 'live' ? 'live' : 'error'}
-              </div>
-            </div>
-            <div className="feed-controls">
-              <button className="sort">Sort: Recent <Icon name="chevdown" /></button>
-              <div className="density">
-                <button className="active"><Icon name="list" /></button>
-                <button><Icon name="grid" /></button>
-              </div>
-            </div>
-          </div>
-
-          <FilterStrip
-            interestMin={interestMin}
-            ethicsMin={ethicsMin}
-            activeCat={activeCat}
-            onClearInterest={() => setInterestMin(0)}
-            onClearEthics={() => setEthicsMin(0)}
-            onClearCat={() => setActiveCat(null)}
-            onClearAll={() => { setInterestMin(0); setEthicsMin(0); setActiveCat(null); setActiveFollow('all'); }}
+      <ResizableLayout
+        sidebar={
+          <Sidebar
+            activeCat={activeCat} setActiveCat={setActiveCat}
+            interestMin={interestMin} setInterestMin={setInterestMin}
+            ethicsMin={ethicsMin} setEthicsMin={setEthicsMin}
+            activeFollow={activeFollow} setActiveFollow={setActiveFollow}
+            count={clips.length}
           />
-
-          <div className="feed-list">
-            {filtered.length === 0 ? (
-              <div className="feed-empty">No clips match these filters.</div>
-            ) : (
-              filtered.map((clip) => (
-                <ClipRow
-                  key={clip.capture.id}
-                  clip={clip}
-                  selected={selected?.capture.id === clip.capture.id}
-                  onClick={() => setSelectedId(clip.capture.id)}
-                  glyphVariant={glyphVariant}
-                />
-              ))
-            )}
-          </div>
-
-          <div className="sov-strip">
-            <span className="item"><span className="ok-dot" />Local-first · IndexedDB</span>
-            <span className="item"><span className="pulse-dot" />Connected to <span className="relay-count">3 relays</span></span>
-            <span className="item">
-              <Icon name="github" /> Extension on GitHub
-            </span>
-            <span className="spacer" />
-            <span className="item"><a>Export NIP-23</a></span>
-            <span className="item"><a>Public key visible</a></span>
-          </div>
-        </main>
-
-        <DetailPanel clip={selected} onClose={() => setSelectedId(null)} />
-      </div>
+        }
+        feed={feedContent}
+        detail={<DetailPanel clip={selected} onClose={() => setSelectedId(null)} />}
+        initialSidebarWidth={200}
+        initialDetailWidth={320}
+      />
     </div>
   );
 }

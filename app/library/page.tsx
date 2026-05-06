@@ -5,12 +5,14 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import TopBar from '@/components/chrome/TopBar';
 import Library from '@/components/clips/Library';
 import SignInModal from '@/components/auth/SignInModal';
 import { useNostrAuth } from '@/hooks/useNostrAuth';
 
 export default function LibraryPage() {
+  const router = useRouter();
   const { auth, signInPubkey } = useNostrAuth();
   const [signInOpen, setSignInOpen] = useState(false);
 
@@ -19,6 +21,7 @@ export default function LibraryPage() {
       <TopBar
         auth={auth}
         onSignIn={() => setSignInOpen(true)}
+        onBrandClick={() => router.push('/')}
         searchPlaceholder="Search your clips…"
       />
       <div className="subpage-bar">

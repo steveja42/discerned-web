@@ -3,6 +3,7 @@
 
 import Link from 'next/link';
 import HeroBeacon from '@/components/brand/HeroBeacon';
+import MiniBeacon from '@/components/brand/MiniBeacon';
 
 export const metadata = {
   title: 'About — Discerned',
@@ -12,8 +13,12 @@ export default function AboutPage() {
   return (
     <div style={{ height: '100%', overflow: 'auto', background: 'var(--paper)' }}>
       <div className="subpage-bar">
-        <Link href="/" className="back-link">← Back to Discernments</Link>
-        <span className="subpage-title">About Discerned</span>
+        <Link href="/" className="back-link brand-link">
+          <MiniBeacon size={20} />
+          Discerned
+        </Link>
+        <span className="subpage-sep">·</span>
+        <span className="subpage-title">About</span>
       </div>
 
       <section className="hero">

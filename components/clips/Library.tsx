@@ -11,6 +11,7 @@ import type { GlyphVariant } from '@/components/glyph/Glyph';
 import ClipRow from '@/components/feed/ClipRow';
 import DetailPanel from '@/components/feed/DetailPanel';
 import LibraryEmpty from './LibraryEmpty';
+import ResizableLayout from '@/components/layout/ResizableLayout';
 
 interface SidebarLocalProps {
   activeCat: string | null;
@@ -103,63 +104,69 @@ export default function Library({ glyphVariant = 'bars' }: LibraryProps) {
 
   const showEmpty = timedOut && !bridgePresent;
 
+  const feedContent = (
+    <main className="feed-col">
+      <div className="feed-head">
+        <div>
+          <h1 className="feed-title">
+            {activeCat
+              ? <>{CATEGORIES[activeCat]?.label ?? activeCat} </>
+              : <>Your <em>Library</em></>}
+          </h1>
+          <div className="feed-meta">
+            {clips.length} clips
+            <span className="sep">·</span>
+            stored locally · IndexedDB
+            <span className="sep">·</span>
+            {bridgePresent ? 'extension connected' : 'private'}
+          </div>
+        </div>
+      </div>
+
+      {showEmpty ? (
+        <LibraryEmpty />
+      ) : !bridgePresent ? (
+        <div className="feed-empty">Waiting for extension…</div>
+      ) : filtered.length === 0 ? (
+        <div className="feed-empty">No clips in this folder.</div>
+      ) : (
+        <div className="feed-list">
+          {filtered.map((clip) => (
+            <ClipRow
+              key={clip.capture.id}
+              clip={clip}
+              selected={selected?.capture.id === clip.capture.id}
+              onClick={() => setSelectedId(clip.capture.id)}
+              glyphVariant={glyphVariant}
+            />
+          ))}
+        </div>
+      )}
+
+      <div className="sov-strip">
+        <span className="item"><span className="ok-dot" />Local-first · IndexedDB</span>
+        <span className="spacer" />
+        <span className="item"><a>Export JSON</a></span>
+      </div>
+    </main>
+  );
+
   return (
     <div className="app">
-      <div className="main">
-        <SidebarLocal
-          activeCat={activeCat}
-          setActiveCat={setActiveCat}
-          catCounts={catCounts}
-          totalCount={clips.length}
-        />
-
-        <main className="feed-col">
-          <div className="feed-head">
-            <div>
-              <h1 className="feed-title">
-                {activeCat
-                  ? <>{CATEGORIES[activeCat]?.label ?? activeCat} </>
-                  : <>Your <em>Library</em></>}
-              </h1>
-              <div className="feed-meta">
-                {clips.length} clips
-                <span className="sep">·</span>
-                stored locally · IndexedDB
-                <span className="sep">·</span>
-                {bridgePresent ? 'extension connected' : 'private'}
-              </div>
-            </div>
-          </div>
-
-          {showEmpty ? (
-            <LibraryEmpty />
-          ) : !bridgePresent ? (
-            <div className="feed-empty">Waiting for extension…</div>
-          ) : filtered.length === 0 ? (
-            <div className="feed-empty">No clips in this folder.</div>
-          ) : (
-            <div className="feed-list">
-              {filtered.map((clip) => (
-                <ClipRow
-                  key={clip.capture.id}
-                  clip={clip}
-                  selected={selected?.capture.id === clip.capture.id}
-                  onClick={() => setSelectedId(clip.capture.id)}
-                  glyphVariant={glyphVariant}
-                />
-              ))}
-            </div>
-          )}
-
-          <div className="sov-strip">
-            <span className="item"><span className="ok-dot" />Local-first · IndexedDB</span>
-            <span className="spacer" />
-            <span className="item"><a>Export JSON</a></span>
-          </div>
-        </main>
-
-        <DetailPanel clip={selected} onClose={() => setSelectedId(null)} />
-      </div>
+      <ResizableLayout
+        sidebar={
+          <SidebarLocal
+            activeCat={activeCat}
+            setActiveCat={setActiveCat}
+            catCounts={catCounts}
+            totalCount={clips.length}
+          />
+        }
+        feed={feedContent}
+        detail={<DetailPanel clip={selected} onClose={() => setSelectedId(null)} />}
+        initialSidebarWidth={200}
+        initialDetailWidth={320}
+      />
     </div>
   );
 }

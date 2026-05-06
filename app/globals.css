@@ -106,6 +106,9 @@ body.style-editorial {
 }
 .back-link { color: var(--accent-ink); cursor: pointer; text-decoration: none; }
 .back-link:hover { text-decoration: underline; }
+.back-link.brand-link { display: flex; align-items: center; gap: 7px; font-family: var(--serif); font-weight: 600; font-style: italic; }
+.back-link.brand-link:hover { text-decoration: none; opacity: 0.8; }
+.subpage-sep { color: var(--ink-4); }
 .subpage-title {
   font-family: var(--serif);
   font-style: italic;
@@ -315,6 +318,27 @@ a { color: inherit; }
   display: grid;
   grid-template-columns: 240px 1fr 380px;
   min-height: calc(100vh - 71px);
+}
+
+/* When JS drives column widths the inline style takes over; keep fallback for non-resizable usage */
+.resizable-main {
+  grid-template-columns: unset; /* overridden by inline style */
+}
+
+/* Column drag handle */
+.col-resizer {
+  width: 4px;
+  cursor: col-resize;
+  background: transparent;
+  position: relative;
+  z-index: 10;
+  transition: background 0.15s;
+  align-self: stretch;
+}
+.col-resizer:hover,
+.col-resizer:active {
+  background: var(--accent);
+  opacity: 0.35;
 }
 
 @media (max-width: 1180px) {
