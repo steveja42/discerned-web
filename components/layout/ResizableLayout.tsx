@@ -16,7 +16,6 @@ const MIN_SIDEBAR = 160;
 const MAX_SIDEBAR = 400;
 const MIN_FEED = 280;
 const MIN_DETAIL = 260;
-const MAX_DETAIL = 600;
 
 export default function ResizableLayout({
   sidebar,
@@ -71,11 +70,12 @@ export default function ResizableLayout({
 
   const dragDetail = useCallback(
     (e: React.MouseEvent) => {
-      startDrag(e, setDetailW, (dx, _cw, cur) =>
-        Math.max(MIN_DETAIL, Math.min(MAX_DETAIL, cur - dx)),
-      );
+      startDrag(e, setDetailW, (dx, cw, cur) => {
+        const maxDetail = cw - sidebarW - MIN_FEED - 8; // 8px for the two resizer gutters
+        return Math.max(MIN_DETAIL, Math.min(maxDetail, cur - dx));
+      });
     },
-    [startDrag],
+    [startDrag, sidebarW],
   );
 
   const columns = showDetail

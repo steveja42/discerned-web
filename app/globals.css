@@ -317,8 +317,11 @@ a { color: inherit; }
 .main {
   display: grid;
   grid-template-columns: 240px 1fr 380px;
-  min-height: calc(100vh - 71px);
+  height: calc(100vh - 71px);
+  overflow: hidden;
+  align-items: stretch;
 }
+.main > * { min-height: 0; }
 
 /* When JS drives column widths the inline style takes over; keep fallback for non-resizable usage */
 .resizable-main {
@@ -361,6 +364,8 @@ a { color: inherit; }
   border-right: 1px solid var(--rule);
   padding: 28px 20px;
   display: flex; flex-direction: column; gap: 28px;
+  overflow-y: auto;
+  scrollbar-color: var(--rule) transparent;
 }
 .side-section-label {
   font-family: var(--mono);
@@ -519,6 +524,8 @@ a { color: inherit; }
 .feed-col {
   display: flex; flex-direction: column;
   min-width: 0;
+  height: 100%;
+  overflow: hidden;
 }
 .feed-head {
   padding: 24px 32px 18px;
