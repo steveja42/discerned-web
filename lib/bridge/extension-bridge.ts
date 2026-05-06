@@ -7,7 +7,8 @@ import type { ClipData } from '@/lib/types';
 
 export type BridgeMessage =
   | { type: 'DISCERNED_BRIDGE_HELLO'; pubkey: string | null; authMethod: 'nip07' | 'nip46' | 'nsec' | 'guest' | null }
-  | { type: 'DISCERNED_BRIDGE_CLIPS'; clips: ClipData[] };
+  | { type: 'DISCERNED_BRIDGE_CLIPS'; clips: ClipData[] }
+  | { type: 'DISCERNED_BRIDGE_NEW_CLIP'; clip: ClipData };
 
 export function listenForBridge(handler: (msg: BridgeMessage) => void): () => void {
   const onMessage = (e: MessageEvent) => {

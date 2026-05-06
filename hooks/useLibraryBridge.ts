@@ -34,6 +34,12 @@ export function useLibraryBridge() {
       if (msg.type === 'DISCERNED_BRIDGE_CLIPS') {
         setState((s) => ({ ...s, clips: msg.clips }));
       }
+      if (msg.type === 'DISCERNED_BRIDGE_NEW_CLIP') {
+        setState((s) => {
+          if (s.clips.some((c) => c.capture.id === msg.clip.capture.id)) return s;
+          return { ...s, clips: [msg.clip, ...s.clips] };
+        });
+      }
     });
 
     const timer = setTimeout(() => {
