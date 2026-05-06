@@ -13,12 +13,14 @@ import FirstVisitPopover from '@/components/popover/FirstVisitPopover';
 import { useNostrAuth } from '@/hooks/useNostrAuth';
 import { useFirstVisit } from '@/hooks/useFirstVisit';
 import { useCastFeed } from '@/hooks/useCastFeed';
+import { useBridgeAuth } from '@/hooks/useBridgeAuth';
 
 export default function HomeClient() {
   const router = useRouter();
   const { auth, signInPubkey } = useNostrAuth();
   const { showPopover, dismiss: dismissPopover } = useFirstVisit();
   const { clips, status } = useCastFeed();
+  useBridgeAuth();
   const [signInOpen, setSignInOpen] = useState(false);
 
   const handleBrandClick = () => {
