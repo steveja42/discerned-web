@@ -51,7 +51,7 @@ export default function ClipRow({ clip, selected, onClick, glyphVariant = 'bars'
           <span className="fav" style={{ background: favColor(domain) }}>{favLetter(domain)}</span>
           <span className="domain">{domain}</span>
           <span className="dot">·</span>
-          <span>{timeAgo(capture.timestamp)}</span>
+          <span suppressHydrationWarning>{timeAgo(capture.timestamp)}</span>
           <span className="scope-tag public">● Cast</span>
         </div>
         <h3 className="clip-title">{capture.title}</h3>
