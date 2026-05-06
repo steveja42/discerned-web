@@ -118,7 +118,7 @@ export default function Library({ glyphVariant = 'bars' }: LibraryProps) {
             <div>
               <h1 className="feed-title">
                 {activeCat
-                  ? <>{CATEGORIES[activeCat]?.label ?? activeCat} <em>folder</em></>
+                  ? <>{CATEGORIES[activeCat]?.label ?? activeCat} </>
                   : <>Your <em>Library</em></>}
               </h1>
               <div className="feed-meta">
