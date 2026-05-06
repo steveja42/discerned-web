@@ -131,9 +131,9 @@ export default function Library({ glyphVariant = 'bars' }: LibraryProps) {
         <div className="feed-empty">No clips in this folder.</div>
       ) : (
         <div className="feed-list">
-          {filtered.map((clip) => (
+          {filtered.map((clip, i) => (
             <ClipRow
-              key={clip.capture.id}
+              key={clip.capture.id ?? i}
               clip={clip}
               selected={selected?.capture.id === clip.capture.id}
               onClick={() => setSelectedId(clip.capture.id)}
