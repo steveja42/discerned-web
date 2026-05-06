@@ -1,4 +1,4 @@
-// Listens for the Discerned extension bridge on the /reading-room page.
+// Listens for the Discerned extension bridge on the /library page.
 // Sets bridgePresent when DISCERNED_BRIDGE_HELLO arrives and populates clips
 // from DISCERNED_BRIDGE_CLIPS. After 2 seconds without a HELLO, sets timedOut
 // so the page can show the extension install prompt instead of a spinner.
@@ -17,7 +17,7 @@ interface BridgeState {
   timedOut: boolean;
 }
 
-export function useReadingRoomBridge() {
+export function useLibraryBridge() {
   const [state, setState] = useState<BridgeState>({
     bridgePresent: false,
     pubkey: null,

@@ -1,9 +1,9 @@
-// Empty state shown in /reading-room when no extension bridge is detected after 2 seconds.
-// Prompts the user to install the Discerned Chrome extension to populate their Reading Room.
+// Empty state shown in /library when no extension bridge is detected after 2 seconds.
+// Prompts the user to install the Discerned Chrome extension to populate their Library.
 
 import Link from 'next/link';
 
-export default function ReadingRoomEmpty() {
+export default function LibraryEmpty() {
   return (
     <div style={{
       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
@@ -20,7 +20,7 @@ export default function ReadingRoomEmpty() {
         </svg>
       </div>
       <h2 style={{ fontFamily: 'var(--serif)', fontSize: 22, fontWeight: 500, color: 'var(--ink)', margin: '0 0 12px', letterSpacing: '-0.015em' }}>
-        Your Reading Room lives in the extension.
+        Your Library lives in the extension.
       </h2>
       <p style={{ fontFamily: 'var(--serif)', fontSize: 15, color: 'var(--ink-2)', lineHeight: 1.6, maxWidth: 400, margin: '0 0 28px' }}>
         Install the Discerned extension to clip and store articles privately.

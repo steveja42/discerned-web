@@ -15,6 +15,7 @@ interface TopBarProps {
   brandHasPopover?: boolean;
   onBrandClick?: () => void;
   searchPlaceholder?: string;
+  extensionPresent?: boolean;
 }
 
 function GitHubIcon() {
@@ -42,7 +43,7 @@ function SearchIcon() {
   );
 }
 
-export default function TopBar({ auth, onSignIn, brandHasPopover, onBrandClick, searchPlaceholder }: TopBarProps) {
+export default function TopBar({ auth, onSignIn, brandHasPopover, onBrandClick, searchPlaceholder, extensionPresent }: TopBarProps) {
   return (
     <header className="topbar">
       <div
@@ -65,6 +66,12 @@ export default function TopBar({ auth, onSignIn, brandHasPopover, onBrandClick, 
       </div>
 
       <div className="topbar-right">
+        {extensionPresent && (
+          <Link href="/library" className="topbar-link topbar-library">
+            <span className="ext-dot" aria-hidden="true" />
+            My Library
+          </Link>
+        )}
         <Link href="/about" className="topbar-link">About</Link>
         <a
           href="https://github.com/discerned-online"

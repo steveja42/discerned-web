@@ -91,7 +91,7 @@ export default function DetailPanel({ clip, onClose }: DetailPanelProps) {
       )}
 
       <div className="detail-section">
-        <div className="detail-section-label">Triple-axis assessment</div>
+        <div className="detail-section-label">Assessment</div>
         <div className="axis-display">
           <div className="axis-large">
             <div className="axis-name">

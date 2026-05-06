@@ -1,16 +1,16 @@
-// Private Reading Room — shows clips delivered from the Discerned extension via postMessage.
+// Private Library — shows clips delivered from the Discerned extension via postMessage.
 // Renders a folder sidebar, clip list, and detail panel. If the bridge times out (2s)
-// with no extension present, shows ReadingRoomEmpty with the install prompt instead.
+// with no extension present, shows LibraryEmpty with the install prompt instead.
 
 'use client';
 
 import { useState, useMemo } from 'react';
-import { useReadingRoomBridge } from '@/hooks/useReadingRoomBridge';
+import { useLibraryBridge } from '@/hooks/useLibraryBridge';
 import { CATEGORIES, INTEREST_LEVELS } from '@/lib/constants';
 import type { GlyphVariant } from '@/components/glyph/Glyph';
 import ClipRow from '@/components/feed/ClipRow';
 import DetailPanel from '@/components/feed/DetailPanel';
-import ReadingRoomEmpty from './ReadingRoomEmpty';
+import LibraryEmpty from './LibraryEmpty';
 
 interface SidebarLocalProps {
   activeCat: string | null;
@@ -62,7 +62,7 @@ function SidebarLocal({ activeCat, setActiveCat, catCounts, totalCount }: Sideba
       </div>
 
       <div className="filters">
-        <div className="side-section-label">Filter by axis</div>
+        <div className="side-section-label">Filter by dimension</div>
         <div className="axis-filter">
           <div className="axis-filter-head">
             <span>Interest</span>
@@ -79,12 +79,12 @@ function SidebarLocal({ activeCat, setActiveCat, catCounts, totalCount }: Sideba
   );
 }
 
-interface ReadingRoomProps {
+interface LibraryProps {
   glyphVariant?: GlyphVariant;
 }
 
-export default function ReadingRoom({ glyphVariant = 'bars' }: ReadingRoomProps) {
-  const { bridgePresent, clips, timedOut } = useReadingRoomBridge();
+export default function Library({ glyphVariant = 'bars' }: LibraryProps) {
+  const { bridgePresent, clips, timedOut } = useLibraryBridge();
   const [activeCat, setActiveCat] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
@@ -119,7 +119,7 @@ export default function ReadingRoom({ glyphVariant = 'bars' }: ReadingRoomProps)
               <h1 className="feed-title">
                 {activeCat
                   ? <>{CATEGORIES[activeCat]?.label ?? activeCat} <em>folder</em></>
-                  : <>Your <em>Reading Room</em></>}
+                  : <>Your <em>Library</em></>}
               </h1>
               <div className="feed-meta">
                 {clips.length} clips
@@ -132,7 +132,7 @@ export default function ReadingRoom({ glyphVariant = 'bars' }: ReadingRoomProps)
           </div>
 
           {showEmpty ? (
-            <ReadingRoomEmpty />
+            <LibraryEmpty />
           ) : !bridgePresent ? (
             <div className="feed-empty">Waiting for extension…</div>
           ) : filtered.length === 0 ? (

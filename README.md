@@ -1,6 +1,6 @@
 # Discerned — Companion Web App
 
-A read-only companion surface for the [Discerned](https://discerned.online) Chrome extension. Browse the public Cast feed on Nostr, explore your private Reading Room, and learn about the project.
+A read-only companion surface for the [Discerned](https://discerned.online) Chrome extension. Browse the public Discernments feed on Nostr, explore your private Library, and learn about the project.
 
 **Clipping happens only in the extension.** This web app does not create clips.
 
@@ -10,9 +10,9 @@ A read-only companion surface for the [Discerned](https://discerned.online) Chro
 
 | Route | Purpose |
 |---|---|
-| `/` | Public Cast feed — live `kind:1` Nostr events tagged `#discerned` |
+| `/` | Public Discernments feed — live `kind:1` Nostr events tagged `#discerned` |
 | `/about` | Brand page — HeroBeacon SVG, philosophy copy |
-| `/reading-room` | Private clips — delivered from the extension via postMessage bridge |
+| `/library` | Private Library — delivered from the extension via postMessage bridge |
 
 ---
 
@@ -49,9 +49,9 @@ pnpm exec tsc --noEmit  # type-check
 app/
   globals.css          # design tokens + all component styles
   layout.tsx           # root layout — body.style-editorial
-  page.tsx             # home / Cast feed
+  page.tsx             # home / Discernments feed
   about/               # About page
-  reading-room/        # Reading Room (extension bridge)
+  library/             # Library (extension bridge)
 components/
   brand/               # MiniBeacon, HeroBeacon SVGs
   chrome/              # TopBar
@@ -59,17 +59,17 @@ components/
   glyph/               # GlyphBars, GlyphRadial, GlyphLetter
   auth/                # SignInModal (NIP-07 / nsec / generate), AuthAvatar
   popover/             # FirstVisitPopover
-  clips/               # ReadingRoom, ReadingRoomEmpty
+  clips/               # Library, LibraryEmpty
 lib/
   types.ts             # ClipData, Capture, Evaluation, AuthState
-  constants.ts         # axis levels, categories, default relays
+  constants.ts         # dimension levels, categories, default relays
   nostr/               # feed subscription, event parsing, auth helpers
   bridge/              # extension postMessage listener
 hooks/
   useCastFeed.ts       # live Nostr feed with mock seed data
   useNostrAuth.ts      # NIP-07 / readonly / guest auth state
   useFirstVisit.ts     # localStorage["discerned.seenHero"] flag
-  useReadingRoomBridge.ts  # extension bridge with 2s timeout
+  useLibraryBridge.ts      # extension bridge for /library with 2s timeout
 ```
 
 See [FILES.md](FILES.md) for a full annotated file manifest.
@@ -90,7 +90,7 @@ Pubkey is stored in `localStorage["discerned.auth"]`.
 
 ## Extension bridge
 
-When the Discerned extension is installed, its content script runs on `discerned.online/*` and posts clips + auth state to the page via `postMessage`. The web app listens via `lib/bridge/extension-bridge.ts` and announces readiness with `DISCERNED_WEB_READY`. If no bridge message arrives within 2 seconds, `/reading-room` shows the install prompt.
+When the Discerned extension is installed, its content script runs on `discerned.online/*` and posts clips + auth state to the page via `postMessage`. The web app listens via `lib/bridge/extension-bridge.ts` and announces readiness with `DISCERNED_WEB_READY`. If no bridge message arrives within 2 seconds, `/library` shows the install prompt. When the bridge is detected, a "My Library" link with a blue indicator dot appears in the TopBar.
 
 ---
 

@@ -5,9 +5,9 @@
 Companion web app for the Discerned Chrome extension, hosted at `discerned.online`. It is a **read-only** surface — clipping happens only in the extension, never here.
 
 Three routes:
-- `/` — public Cast feed (Nostr `kind:1` events tagged `#discerned`)
+- `/` — public Discernments feed (Nostr `kind:1` events tagged `#discerned`)
 - `/about` — brand/marketing page with HeroBeacon SVG
-- `/reading-room` — user's private clips, delivered via extension postMessage bridge
+- `/library` — user's private Library, delivered via extension postMessage bridge
 
 ## Tech stack
 
@@ -55,7 +55,7 @@ app/
   page.tsx             ← home (mounts HomeClient)
   HomeClient.tsx       ← client: feed + popover + modal
   about/page.tsx       ← HeroBeacon + philosophy copy
-  reading-room/page.tsx
+  library/page.tsx
 components/
   brand/               ← MiniBeacon.tsx, HeroBeacon.tsx (do not modify SVGs)
   chrome/              ← TopBar.tsx
@@ -63,7 +63,7 @@ components/
   glyph/               ← Glyph, GlyphBars, GlyphRadial, GlyphLetter
   auth/                ← SignInModal, AuthAvatar
   popover/             ← FirstVisitPopover
-  clips/               ← ReadingRoom, ReadingRoomEmpty
+  clips/               ← Library, LibraryEmpty
 lib/
   types.ts             ← ClipData, Capture, Evaluation, AuthState
   constants.ts         ← INTEREST_LEVELS, ETHICS_LEVELS, CATEGORIES, DEFAULT_RELAYS
@@ -74,7 +74,7 @@ hooks/
   useCastFeed.ts
   useNostrAuth.ts
   useFirstVisit.ts
-  useReadingRoomBridge.ts
+  useLibraryBridge.ts  ← bridge listener for /library, 2s timeout
 ```
 
 ## Brand mark discipline

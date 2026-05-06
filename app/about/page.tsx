@@ -12,7 +12,7 @@ export default function AboutPage() {
   return (
     <div style={{ height: '100%', overflow: 'auto', background: 'var(--paper)' }}>
       <div className="subpage-bar">
-        <Link href="/" className="back-link">← Back to Cast</Link>
+        <Link href="/" className="back-link">← Back to Discernments</Link>
         <span className="subpage-title">About Discerned</span>
       </div>
 
@@ -30,7 +30,6 @@ export default function AboutPage() {
           </p>
           <div className="hero-cta">
             <button className="btn primary">Get the extension</button>
-            <Link href="/reading-room" className="btn">Open your Reading Room →</Link>
           </div>
         </div>
       </section>

@@ -79,7 +79,7 @@ function Sidebar({
       </div>
 
       <div className="filters">
-        <div className="side-section-label">Filter by axis</div>
+        <div className="side-section-label">Filter by dimension</div>
 
         <div className="axis-filter">
           <div className="axis-filter-head">
@@ -200,7 +200,7 @@ export default function CastFeed({ glyphVariant = 'bars', status, clips }: CastF
         <main className="feed-col">
           <div className="feed-head">
             <div>
-              <h1 className="feed-title">The <em>Cast</em></h1>
+              <h1 className="feed-title"><em>Discernments</em></h1>
               <div className="feed-meta">
                 {filtered.length} clips
                 <span className="sep">·</span>

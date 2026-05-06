@@ -272,6 +272,15 @@ a { color: inherit; }
   transition: background .12s, color .12s;
 }
 .topbar-link:hover { background: var(--paper-3); color: var(--ink); }
+.ext-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  margin-right: 5px;
+  vertical-align: middle;
+}
 .icon-btn {
   width: 34px; height: 34px;
   display: grid; place-items: center;

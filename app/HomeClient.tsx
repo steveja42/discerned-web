@@ -20,7 +20,7 @@ export default function HomeClient() {
   const { auth, signInPubkey } = useNostrAuth();
   const { showPopover, dismiss: dismissPopover } = useFirstVisit();
   const { clips, status } = useCastFeed();
-  useBridgeAuth();
+  const { extensionPresent } = useBridgeAuth();
   const [signInOpen, setSignInOpen] = useState(false);
 
   const handleBrandClick = () => {
@@ -40,6 +40,7 @@ export default function HomeClient() {
         onSignIn={() => setSignInOpen(true)}
         brandHasPopover={showPopover}
         onBrandClick={handleBrandClick}
+        extensionPresent={extensionPresent}
       />
 
       {showPopover && (
