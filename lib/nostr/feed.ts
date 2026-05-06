@@ -16,8 +16,15 @@ export function subscribeFeed(
     filter,
     { onevent: onEvent, oneose: onEose },
   );
+
+  let closed = false;
   return () => {
+    if (closed) return;
+    closed = true;
     sub.close();
-    pool.close([...DEFAULT_RELAYS]);
+    // destroy() tears down all relay connections cleanly regardless of their
+    // current WebSocket readyState, avoiding "already CLOSING or CLOSED"
+    // warnings from React Strict Mode's double effect invocation in dev.
+    pool.destroy();
   };
 }
