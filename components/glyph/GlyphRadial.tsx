@@ -1,8 +1,5 @@
-// Concentric arc-ring SVG glyph — an alternate evaluation display.
-// Outer ring = Interest arc, inner ring = Ethics arc.
-// Centre dot colour matches the category hue. Used when glyphVariant='radial'.
-
 import { CATEGORIES, interestRank, ethicsRank } from '@/lib/constants';
+import { interestColor, ethicsColor } from '@/lib/dimensionColor';
 
 interface GlyphRadialProps {
   interest: string;
@@ -13,8 +10,12 @@ interface GlyphRadialProps {
 export default function GlyphRadial({ interest, ethics, category }: GlyphRadialProps) {
   const cat = CATEGORIES[category] ?? { label: category, hue: 60 };
   const cx = 32, cy = 32, r = 22;
-  const iAngle = ((interestRank(interest) + 1) / 5) * 360;
-  const eAngle = ((ethicsRank(ethics) + 1) / 6) * 360;
+  const iRank = interestRank(interest);
+  const eRank = ethicsRank(ethics);
+  const iAngle = ((iRank + 1) / 5) * 360;
+  const eAngle = ((eRank + 1) / 6) * 360;
+  const iColor = interestColor(iRank, 1, 4);
+  const eColor = ethicsColor(eRank, 3, 5);
 
   const arc = (radius: number, angle: number) => {
     const a = (angle - 90) * Math.PI / 180;
@@ -29,8 +30,8 @@ export default function GlyphRadial({ interest, ethics, category }: GlyphRadialP
       <svg width="64" height="64" viewBox="0 0 64 64">
         <circle cx={cx} cy={cy} r={r} fill="none" stroke="var(--rule)" strokeWidth="1.5" />
         <circle cx={cx} cy={cy} r={r - 7} fill="none" stroke="var(--rule)" strokeWidth="1.5" />
-        <path d={arc(r, iAngle)} fill="none" stroke="var(--interest)" strokeWidth="3" strokeLinecap="round" />
-        <path d={arc(r - 7, eAngle)} fill="none" stroke="var(--ethics)" strokeWidth="3" strokeLinecap="round" />
+        <path d={arc(r, iAngle)} fill="none" stroke={iColor} strokeWidth="3" strokeLinecap="round" />
+        <path d={arc(r - 7, eAngle)} fill="none" stroke={eColor} strokeWidth="3" strokeLinecap="round" />
         <circle cx={cx} cy={cy} r="3" fill={`oklch(0.50 0.08 ${cat.hue})`} />
       </svg>
       <div className="cat-tag" style={{ marginTop: 4 }}>

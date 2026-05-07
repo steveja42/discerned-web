@@ -117,7 +117,7 @@ export default function DetailPanel({ clip, onClose }: DetailPanelProps) {
             </div>
             <div className="axis-track">
               {INTEREST_LEVELS.map((lvl, i) => (
-                <div key={lvl} className={`seg ${i <= iIdx ? 'on interest' : ''}`} title={lvl} style={i <= iIdx ? { background: interestColor(i, 1, 4) } : undefined} />
+                <div key={lvl} className={`seg ${i <= iIdx ? 'on interest' : ''}`} title={lvl} style={i === iIdx ? { background: interestColor(i, 1, 4) } : undefined} />
               ))}
             </div>
             <div className="axis-num" style={{ fontSize: 11, fontFamily: 'var(--mono)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
@@ -131,7 +131,7 @@ export default function DetailPanel({ clip, onClose }: DetailPanelProps) {
             </div>
             <div className="axis-track">
               {ETHICS_LEVELS.map((lvl, i) => (
-                <div key={lvl} className={`seg ${i <= eIdx ? 'on ethics' : ''}`} title={lvl} style={i <= eIdx ? { background: ethicsColor(i, 3, 5) } : undefined} />
+                <div key={lvl} className={`seg ${i <= eIdx ? 'on ethics' : ''}`} title={lvl} style={i === eIdx ? { background: ethicsColor(i, 3, 5) } : undefined} />
               ))}
             </div>
             <div className="axis-num" style={{ fontSize: 11, fontFamily: 'var(--mono)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>

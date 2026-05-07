@@ -1,8 +1,5 @@
-// Horizontal bar-meter glyph — the default clip evaluation display.
-// Renders Interest (5 segments) and Ethics (6 segments) as filled pip rows,
-// plus a colour-coded category chip derived from the CATEGORIES hue map.
-
 import { CATEGORIES, interestRank, ethicsRank } from '@/lib/constants';
+import { interestColor, ethicsColor } from '@/lib/dimensionColor';
 
 interface GlyphBarsProps {
   interest: string;
@@ -10,11 +7,17 @@ interface GlyphBarsProps {
   category: string;
 }
 
-function Bars({ value, max, kind }: { value: number; max: number; kind: string }) {
+type ColorFn = (rank: number, neutralRank: number, maxRank: number) => string;
+
+function Bars({ rank, neutralRank, max, colorFn }: { rank: number; neutralRank: number; max: number; colorFn: ColorFn }) {
   return (
     <div className="bars">
       {Array.from({ length: max }).map((_, i) => (
-        <div key={i} className={`bar ${i < value ? `on ${kind}` : ''}`} />
+        <div
+          key={i}
+          className="bar"
+          style={i === rank ? { background: colorFn(rank, neutralRank, max - 1) } : undefined}
+        />
       ))}
     </div>
   );
@@ -22,17 +25,21 @@ function Bars({ value, max, kind }: { value: number; max: number; kind: string }
 
 export default function GlyphBars({ interest, ethics, category }: GlyphBarsProps) {
   const cat = CATEGORIES[category] ?? { label: category, hue: 60 };
+  const iRank = interestRank(interest);
+  const eRank = ethicsRank(ethics);
+  const iNeutral = iRank === 1;
+  const eNeutral = eRank === 3;
   return (
     <div className="glyph">
       <div className="glyph-row" title={`Interest: ${interest}`}>
         <span className="axis-key">I</span>
-        <Bars value={interestRank(interest) + 1} max={5} kind="interest" />
-        <span style={{ marginLeft: 4, color: 'var(--ink-2)', fontSize: 10 }}>{interest}</span>
+        <Bars rank={iRank} neutralRank={1} max={5} colorFn={interestColor} />
+        <span style={{ marginLeft: 4, color: iNeutral ? 'var(--ink-4)' : interestColor(iRank, 1, 4), fontSize: iNeutral ? 9 : 10 }}>{interest}</span>
       </div>
       <div className="glyph-row" title={`Ethics: ${ethics}`}>
         <span className="axis-key">E</span>
-        <Bars value={ethicsRank(ethics) + 1} max={6} kind="ethics" />
-        <span style={{ marginLeft: 4, color: 'var(--ink-2)', fontSize: 10 }}>{ethics}</span>
+        <Bars rank={eRank} neutralRank={3} max={6} colorFn={ethicsColor} />
+        <span style={{ marginLeft: 4, color: eNeutral ? 'var(--ink-4)' : ethicsColor(eRank, 3, 5), fontSize: eNeutral ? 9 : 10 }}>{ethics}</span>
       </div>
       <div className="cat-tag">
         <span className="swatch" style={{ background: `oklch(0.50 0.08 ${cat.hue})` }} />
