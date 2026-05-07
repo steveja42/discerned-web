@@ -5,6 +5,7 @@
 
 import type { ClipData } from '@/lib/types';
 import { CATEGORIES, INTEREST_LEVELS, ETHICS_LEVELS, interestRank, ethicsRank } from '@/lib/constants';
+import { interestColor, ethicsColor } from '@/lib/dimensionColor';
 
 interface DetailPanelProps {
   clip: ClipData | null;
@@ -77,10 +78,15 @@ export default function DetailPanel({ clip, onClose }: DetailPanelProps) {
         <div className="detail-byline">{timeAgo(capture.timestamp)}</div>
       </div>
 
-      {(capture.selectionText || capture.bodyText) && (
+      {(capture.bodyHtml || capture.selectionText) ? (
         <div className="detail-section">
           <div className="detail-section-label">Highlighted excerpt</div>
-          <blockquote className="detail-excerpt">{capture.selectionText ?? capture.bodyText}</blockquote>
+          <iframe
+            className="clip-frame"
+            srcDoc={capture.bodyHtml ?? capture.selectionText}
+            sandbox="allow-same-origin"
+            title="Clip content"
+          />
           {capture.note && (
             <div style={{ marginTop: 16, paddingTop: 14, borderTop: '1px solid var(--rule-soft)' }}>
               <div className="detail-section-label" style={{ marginBottom: 8 }}>Note</div>
@@ -88,7 +94,18 @@ export default function DetailPanel({ clip, onClose }: DetailPanelProps) {
             </div>
           )}
         </div>
-      )}
+      ) : capture.bodyText ? (
+        <div className="detail-section">
+          <div className="detail-section-label">Highlighted excerpt</div>
+          <blockquote className="detail-excerpt">{capture.bodyText}</blockquote>
+          {capture.note && (
+            <div style={{ marginTop: 16, paddingTop: 14, borderTop: '1px solid var(--rule-soft)' }}>
+              <div className="detail-section-label" style={{ marginBottom: 8 }}>Note</div>
+              <p style={{ margin: 0, fontFamily: 'var(--sans)', fontSize: 13.5, lineHeight: 1.55, color: 'var(--ink-2)' }}>{capture.note}</p>
+            </div>
+          )}
+        </div>
+      ) : null}
 
       <div className="detail-section">
         <div className="detail-section-label">Assessment</div>
@@ -100,7 +117,7 @@ export default function DetailPanel({ clip, onClose }: DetailPanelProps) {
             </div>
             <div className="axis-track">
               {INTEREST_LEVELS.map((lvl, i) => (
-                <div key={lvl} className={`seg ${i <= iIdx ? 'on interest' : ''}`} title={lvl} />
+                <div key={lvl} className={`seg ${i <= iIdx ? 'on interest' : ''}`} title={lvl} style={i <= iIdx ? { background: interestColor(i, 1, 4) } : undefined} />
               ))}
             </div>
             <div className="axis-num" style={{ fontSize: 11, fontFamily: 'var(--mono)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
@@ -114,7 +131,7 @@ export default function DetailPanel({ clip, onClose }: DetailPanelProps) {
             </div>
             <div className="axis-track">
               {ETHICS_LEVELS.map((lvl, i) => (
-                <div key={lvl} className={`seg ${i <= eIdx ? 'on ethics' : ''}`} title={lvl} />
+                <div key={lvl} className={`seg ${i <= eIdx ? 'on ethics' : ''}`} title={lvl} style={i <= eIdx ? { background: ethicsColor(i, 3, 5) } : undefined} />
               ))}
             </div>
             <div className="axis-num" style={{ fontSize: 11, fontFamily: 'var(--mono)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
