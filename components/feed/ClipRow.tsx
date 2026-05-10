@@ -14,15 +14,8 @@ interface ClipRowProps {
   glyphVariant?: GlyphVariant;
 }
 
-function timeAgo(ts: number): string {
-  const diff = Date.now() - ts;
-  const h = Math.floor(diff / 3600_000);
-  if (h < 1) return 'just now';
-  if (h < 24) return `${h}h ago`;
-  const d = Math.floor(h / 24);
-  if (d === 1) return 'Yesterday';
-  if (d < 7) return `${d} days ago`;
-  return 'Last week';
+function formatDate(ts: number): string {
+  return new Date(ts).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 }
 
 function domainOf(url: string): string {
@@ -51,7 +44,7 @@ export default function ClipRow({ clip, selected, onClick, glyphVariant = 'bars'
           <span className="fav" style={{ background: favColor(domain) }}>{favLetter(domain)}</span>
           <span className="domain">{domain}</span>
           <span className="dot">·</span>
-          <span suppressHydrationWarning>{timeAgo(capture.timestamp)}</span>
+          <span>{formatDate(capture.timestamp)}</span>
           <span className="scope-tag public">● Discernments</span>
         </div>
         <h3 className="clip-title">{capture.title}</h3>
