@@ -27,14 +27,8 @@ function favColor(domain: string): string {
   return `oklch(0.30 0.08 ${hue})`;
 }
 
-function timeAgo(ts: number): string {
-  const diff = Date.now() - ts;
-  const h = Math.floor(diff / 3600_000);
-  if (h < 1) return 'just now';
-  if (h < 24) return `${h}h ago`;
-  const d = Math.floor(h / 24);
-  if (d === 1) return 'Yesterday';
-  return `${d} days ago`;
+function formatDate(ts: number): string {
+  return new Date(ts).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 }
 
 export default function DetailPanel({ clip, onClose }: DetailPanelProps) {
@@ -75,7 +69,7 @@ export default function DetailPanel({ clip, onClose }: DetailPanelProps) {
           </button>
         </div>
         <h2 className="detail-title">{capture.title}</h2>
-        <div className="detail-byline">{timeAgo(capture.timestamp)}</div>
+        <div className="detail-byline">{formatDate(capture.timestamp)}</div>
       </div>
 
       {(capture.bodyHtml || capture.selectionText) ? (
