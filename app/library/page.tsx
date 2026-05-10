@@ -10,10 +10,12 @@ import TopBar from '@/components/chrome/TopBar';
 import Library from '@/components/clips/Library';
 import SignInModal from '@/components/auth/SignInModal';
 import { useNostrAuth } from '@/hooks/useNostrAuth';
+import { useBridgeAuth } from '@/hooks/useBridgeAuth';
 
 export default function LibraryPage() {
   const router = useRouter();
   const { auth, signInPubkey } = useNostrAuth();
+  const { extensionPresent } = useBridgeAuth();
   const [signInOpen, setSignInOpen] = useState(false);
 
   return (
@@ -23,6 +25,7 @@ export default function LibraryPage() {
         onSignIn={() => setSignInOpen(true)}
         onBrandClick={() => router.push('/')}
         searchPlaceholder="Search your clips…"
+        extensionPresent={extensionPresent}
       />
       <div className="subpage-bar">
         <Link href="/" className="back-link">← Back to Discernments</Link>

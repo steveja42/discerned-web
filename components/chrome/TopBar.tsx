@@ -6,7 +6,7 @@
 
 import Link from 'next/link';
 import MiniBeacon from '@/components/brand/MiniBeacon';
-import AuthAvatar from '@/components/auth/AuthAvatar';
+import StatusDot from '@/components/auth/StatusDot';
 import type { AuthState } from '@/lib/types';
 
 interface TopBarProps {
@@ -85,7 +85,25 @@ export default function TopBar({ auth, onSignIn, brandHasPopover, onBrandClick, 
         <button className="icon-btn" title="Settings">
           <SettingsIcon />
         </button>
-        <AuthAvatar auth={auth} onClick={onSignIn} />
+        <StatusDot
+          connected={auth.status !== 'guest'}
+          tooltip={
+            auth.status === 'guest'
+              ? 'Sign in with Nostr'
+              : `Nostr · ${
+                  auth.source === 'nip07' ? 'via NIP-07' :
+                  auth.source === 'bridge' ? 'via bridge' :
+                  'read-only'
+                } · ${auth.pubkey?.slice(0, 8)}…`
+          }
+          onClick={onSignIn}
+          label={auth.status === 'guest' ? 'Sign in with Nostr' : `Nostr connected · ${auth.pubkey?.slice(0, 8)}`}
+        />
+        <StatusDot
+          connected={!!extensionPresent}
+          tooltip={extensionPresent ? 'Extension connected' : 'Extension not detected'}
+          label={extensionPresent ? 'Extension connected' : 'Extension not detected'}
+        />
       </div>
     </header>
   );
