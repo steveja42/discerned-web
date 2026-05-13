@@ -3,20 +3,23 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import TopBar from '@/components/chrome/TopBar';
 import Library from '@/components/clips/Library';
 import SignInModal from '@/components/auth/SignInModal';
 import { useNostrAuth } from '@/hooks/useNostrAuth';
 import { useBridgeAuth } from '@/hooks/useBridgeAuth';
 
-export default function LibraryPage() {
+function LibraryContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { auth, signInPubkey } = useNostrAuth();
   const { extensionPresent } = useBridgeAuth();
   const [signInOpen, setSignInOpen] = useState(false);
+
+  const initialClipId = searchParams.get('clip') ?? undefined;
 
   return (
     <div>
@@ -32,7 +35,7 @@ export default function LibraryPage() {
         <span className="subpage-title">My Library</span>
         <span className="subpage-meta">Opened from extension · IndexedDB</span>
       </div>
-      <Library />
+      <Library initialClipId={initialClipId} />
       {signInOpen && (
         <SignInModal
           onClose={() => setSignInOpen(false)}
@@ -40,5 +43,13 @@ export default function LibraryPage() {
         />
       )}
     </div>
+  );
+}
+
+export default function LibraryPage() {
+  return (
+    <Suspense>
+      <LibraryContent />
+    </Suspense>
   );
 }

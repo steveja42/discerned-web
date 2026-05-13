@@ -82,12 +82,13 @@ function SidebarLocal({ activeCat, setActiveCat, catCounts, totalCount }: Sideba
 
 interface LibraryProps {
   glyphVariant?: GlyphVariant;
+  initialClipId?: string;
 }
 
-export default function Library({ glyphVariant = 'bars' }: LibraryProps) {
+export default function Library({ glyphVariant = 'bars', initialClipId }: LibraryProps) {
   const { bridgePresent, clips, timedOut } = useLibraryBridge();
   const [activeCat, setActiveCat] = useState<string | null>(null);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(initialClipId ?? null);
 
   const filtered = useMemo(() =>
     clips.filter((c) => !activeCat || c.evaluation.category === activeCat),
