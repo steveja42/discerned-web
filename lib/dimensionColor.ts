@@ -11,7 +11,7 @@ function belowNeutralColor(rank: number, neutralRank: number): string {
 // Insightful:  oklch(0.54 0.22 245) — strong blue
 // Wise:        oklch(0.38 0.28 260) — deep indigo
 export function interestColor(rank: number, neutralRank: number, maxRank: number): string {
-  if (rank === neutralRank) return 'oklch(0.80 0.03 250)';
+  if (rank === neutralRank) return 'oklch(0.80 0.03 250 / 0.42)';
   if (rank < neutralRank) return belowNeutralColor(rank, neutralRank);
   const t = (rank - neutralRank) / (maxRank - neutralRank);
   const L = 0.68 - t * 0.30;
@@ -24,7 +24,7 @@ export function interestColor(rank: number, neutralRank: number, maxRank: number
 // Honest:    oklch(0.65 0.14 148) — clear mid-green
 // Exemplary: oklch(0.42 0.22 158) — deep rich green
 export function ethicsColor(rank: number, neutralRank: number, maxRank: number): string {
-  if (rank === neutralRank) return 'oklch(0.80 0.03 150)';
+  if (rank === neutralRank) return 'oklch(0.80 0.03 150 / 0.42)';
   if (rank < neutralRank) return belowNeutralColor(rank, neutralRank);
   const t = (rank - neutralRank) / (maxRank - neutralRank);
   const L = 0.65 - t * 0.23;

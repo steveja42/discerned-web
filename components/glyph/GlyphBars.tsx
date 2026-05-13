@@ -34,12 +34,12 @@ export default function GlyphBars({ interest, ethics, category }: GlyphBarsProps
       <div className="glyph-row" title={`Interest: ${interest}`}>
         <span className="axis-key">I</span>
         <Bars rank={iRank} neutralRank={1} max={5} colorFn={interestColor} />
-        <span style={{ marginLeft: 4, color: iNeutral ? 'var(--ink-4)' : interestColor(iRank, 1, 4), fontSize: iNeutral ? 9 : 10 }}>{interest}</span>
+        <span style={{ marginLeft: 4, color: interestColor(iRank, 1, 4), fontSize: iNeutral ? 9 : 10 }}>{interest}</span>
       </div>
       <div className="glyph-row" title={`Ethics: ${ethics}`}>
         <span className="axis-key">E</span>
         <Bars rank={eRank} neutralRank={3} max={6} colorFn={ethicsColor} />
-        <span style={{ marginLeft: 4, color: eNeutral ? 'var(--ink-4)' : ethicsColor(eRank, 3, 5), fontSize: eNeutral ? 9 : 10 }}>{ethics}</span>
+        <span style={{ marginLeft: 4, color: ethicsColor(eRank, 3, 5), fontSize: eNeutral ? 9 : 10 }}>{ethics}</span>
       </div>
       <div className="cat-tag">
         <span className="swatch" style={{ background: `oklch(0.50 0.08 ${cat.hue})` }} />
