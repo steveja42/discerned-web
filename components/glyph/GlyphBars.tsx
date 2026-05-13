@@ -28,7 +28,7 @@ export default function GlyphBars({ interest, ethics, category }: GlyphBarsProps
   const iRank = interestRank(interest);
   const eRank = ethicsRank(ethics);
   const iNeutral = iRank === 1;
-  const eNeutral = eRank === 3;
+  const eNeutral = eRank === 2;
   return (
     <div className="glyph">
       <div className="glyph-row" title={`Interest: ${interest}`}>
@@ -38,8 +38,8 @@ export default function GlyphBars({ interest, ethics, category }: GlyphBarsProps
       </div>
       <div className="glyph-row" title={`Ethics: ${ethics}`}>
         <span className="axis-key">E</span>
-        <Bars rank={eRank} neutralRank={3} max={6} colorFn={ethicsColor} />
-        <span style={{ marginLeft: 4, color: ethicsColor(eRank, 3, 5), fontSize: eNeutral ? 9 : 10 }}>{ethics}</span>
+        <Bars rank={eRank} neutralRank={2} max={5} colorFn={ethicsColor} />
+        <span style={{ marginLeft: 4, color: ethicsColor(eRank, 2, 4), fontSize: eNeutral ? 9 : 10 }}>{ethics}</span>
       </div>
       <div className="cat-tag">
         <span className="swatch" style={{ background: `oklch(0.50 0.08 ${cat.hue})` }} />

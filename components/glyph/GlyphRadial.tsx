@@ -13,9 +13,9 @@ export default function GlyphRadial({ interest, ethics, category }: GlyphRadialP
   const iRank = interestRank(interest);
   const eRank = ethicsRank(ethics);
   const iAngle = ((iRank + 1) / 5) * 360;
-  const eAngle = ((eRank + 1) / 6) * 360;
+  const eAngle = ((eRank + 1) / 5) * 360;
   const iColor = interestColor(iRank, 1, 4);
-  const eColor = ethicsColor(eRank, 3, 5);
+  const eColor = ethicsColor(eRank, 2, 4);
 
   const arc = (radius: number, angle: number) => {
     const a = (angle - 90) * Math.PI / 180;

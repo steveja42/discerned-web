@@ -12,7 +12,7 @@ export default function GlyphLetter({ interest, ethics, category }: GlyphLetterP
   const iShort = interest.slice(0, 4);
   const eShort = ethics.slice(0, 4);
   const iColor = interestColor(interestRank(interest), 1, 4);
-  const eColor = ethicsColor(ethicsRank(ethics), 3, 5);
+  const eColor = ethicsColor(ethicsRank(ethics), 2, 4);
   return (
     <div className="glyph" style={{ alignItems: 'flex-end', minWidth: 130 }}>
       <div className="letter-grade">

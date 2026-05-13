@@ -2,7 +2,7 @@
 // Hue values drive oklch() colour generation for category swatches in the UI.
 
 export const INTEREST_LEVELS = ['Noise', 'Neutral', 'Interesting', 'Insightful', 'Wise'] as const;
-export const ETHICS_LEVELS = ['Malicious', 'Misleading', 'Biased', 'Neutral', 'Honest', 'Exemplary'] as const;
+export const ETHICS_LEVELS = ['Malicious', 'Misleading', 'Neutral', 'Honest', 'Exemplary'] as const;
 
 export const CATEGORIES: Record<string, { label: string; hue: number }> = {
   General:    { label: 'General',    hue: 60 },

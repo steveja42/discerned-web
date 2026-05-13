@@ -4,7 +4,7 @@
 
 export type ClipFormat = 'selection' | 'article' | 'simplified-article' | 'full-page' | 'bookmark';
 export type InterestLevel = 'Noise' | 'Neutral' | 'Interesting' | 'Insightful' | 'Wise';
-export type EthicsLevel = 'Malicious' | 'Misleading' | 'Biased' | 'Neutral' | 'Honest' | 'Exemplary';
+export type EthicsLevel = 'Malicious' | 'Misleading' | 'Neutral' | 'Honest' | 'Exemplary';
 export type Category = string;
 
 export interface Capture {

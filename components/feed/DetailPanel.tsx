@@ -121,11 +121,11 @@ export default function DetailPanel({ clip, onClose }: DetailPanelProps) {
           <div className="axis-large">
             <div className="axis-name">
               Ethics
-              <small>{ETHICS_LEVELS[0]} → {ETHICS_LEVELS[5]}</small>
+              <small>{ETHICS_LEVELS[0]} → {ETHICS_LEVELS[4]}</small>
             </div>
             <div className="axis-track">
               {ETHICS_LEVELS.map((lvl, i) => (
-                <div key={lvl} className={`seg ${i <= eIdx ? 'on ethics' : ''}`} title={lvl} style={i === eIdx ? { background: ethicsColor(i, 3, 5) } : undefined} />
+                <div key={lvl} className={`seg ${i <= eIdx ? 'on ethics' : ''}`} title={lvl} style={i === eIdx ? { background: ethicsColor(i, 2, 4) } : undefined} />
               ))}
             </div>
             <div className="axis-num" style={{ fontSize: 11, fontFamily: 'var(--mono)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
