@@ -2,7 +2,7 @@
 // ClipData is the canonical unit of information flowing through both the extension
 // bridge (postMessage) and the public Nostr cast feed.
 
-export type ClipFormat = 'selection' | 'article' | 'simplified-article' | 'full-page' | 'bookmark';
+export type ClipFormat = 'selection' | 'article' | 'full-page' | 'bookmark';
 export type InterestLevel = 'Noise' | 'Neutral' | 'Interesting' | 'Insightful' | 'Wise';
 export type EthicsLevel = 'Malicious' | 'Misleading' | 'Neutral' | 'Honest' | 'Exemplary';
 export type Category = string;
