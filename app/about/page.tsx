@@ -1,25 +1,24 @@
-// Static server-rendered About page. Renders the HeroBeacon illustration,
-// product pitch copy, and philosophy sections. No client JS required.
+'use client';
 
-import Link from 'next/link';
+import { useState } from 'react';
 import HeroBeacon from '@/components/brand/HeroBeacon';
-import MiniBeacon from '@/components/brand/MiniBeacon';
-
-export const metadata = {
-  title: 'About — Discerned',
-};
+import TopBar from '@/components/chrome/TopBar';
+import SignInModal from '@/components/auth/SignInModal';
+import { useNostrAuth } from '@/hooks/useNostrAuth';
+import { useBridgeAuth } from '@/hooks/useBridgeAuth';
 
 export default function AboutPage() {
+  const { auth, signInPubkey } = useNostrAuth();
+  const { extensionPresent } = useBridgeAuth();
+  const [signInOpen, setSignInOpen] = useState(false);
+
   return (
     <div style={{ height: '100%', overflow: 'auto', background: 'var(--paper)' }}>
-      <div className="subpage-bar">
-        <Link href="/" className="back-link brand-link">
-          <MiniBeacon size={20} />
-          Discerned
-        </Link>
-        <span className="subpage-sep">·</span>
-        <span className="subpage-title">About</span>
-      </div>
+      <TopBar
+        auth={auth}
+        onSignIn={() => setSignInOpen(true)}
+        extensionPresent={extensionPresent}
+      />
 
       <section className="hero">
         <div className="hero-art">
@@ -61,6 +60,13 @@ export default function AboutPage() {
           because considered judgment cannot be rushed.
         </p>
       </section>
+
+      {signInOpen && (
+        <SignInModal
+          onClose={() => setSignInOpen(false)}
+          onSignedIn={(pubkey) => signInPubkey(pubkey)}
+        />
+      )}
     </div>
   );
 }

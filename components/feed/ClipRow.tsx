@@ -45,26 +45,19 @@ export default function ClipRow({ clip, selected, onClick, glyphVariant = 'bars'
           <span className="domain">{domain}</span>
           <span className="dot">·</span>
           <span>{formatDate(capture.timestamp)}</span>
-          <span className="scope-tag public">● Discernments</span>
         </div>
+        <Glyph
+          interest={evaluation.interest}
+          ethics={evaluation.ethics}
+          category={evaluation.category}
+          variant={glyphVariant}
+        />
         <h3 className="clip-title">{capture.title}</h3>
         {(capture.selectionText || capture.bodyText) && (
           <p className="clip-excerpt">{capture.selectionText ?? capture.bodyText}</p>
         )}
         {capture.note && <div className="clip-note">{capture.note}</div>}
-        <div className="clip-foot">
-          <span className="by">
-            <span className="av">N</span>
-            clipped
-          </span>
-        </div>
       </div>
-      <Glyph
-        interest={evaluation.interest}
-        ethics={evaluation.ethics}
-        category={evaluation.category}
-        variant={glyphVariant}
-      />
     </article>
   );
 }

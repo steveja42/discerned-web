@@ -1,15 +1,13 @@
 'use client';
 
-import { useRef, useCallback, useEffect, useState, type ReactNode } from 'react';
+import { useRef, useCallback, useState, type ReactNode } from 'react';
 
 interface ResizableLayoutProps {
   sidebar: ReactNode;
   feed: ReactNode;
   detail: ReactNode;
-  /** Whether the detail panel is rendered (hidden on narrow viewports) */
   showDetail?: boolean;
   initialSidebarWidth?: number;
-  initialDetailWidth?: number;
 }
 
 const MIN_SIDEBAR = 160;
@@ -23,10 +21,10 @@ export default function ResizableLayout({
   detail,
   showDetail = true,
   initialSidebarWidth = 200,
-  initialDetailWidth = 320,
 }: ResizableLayoutProps) {
   const [sidebarW, setSidebarW] = useState(initialSidebarWidth);
-  const [detailW, setDetailW] = useState(initialDetailWidth);
+  // null = use CSS fr-based default; number = user has dragged, use px
+  const [detailW, setDetailW] = useState<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const startDrag = useCallback(
@@ -37,8 +35,12 @@ export default function ResizableLayout({
     ) => {
       e.preventDefault();
       const startX = e.clientX;
-      const containerW = containerRef.current?.offsetWidth ?? 1200;
-      const currentW = setter === setSidebarW ? sidebarW : detailW;
+      const containerW = containerRef.current?.offsetWidth ?? window.innerWidth;
+      // If detail hasn't been dragged yet, measure its current rendered width
+      const currentDetailW = detailW ?? (containerRef.current
+        ? containerRef.current.offsetWidth - sidebarW - 8
+        : 600);
+      const currentW = setter === setSidebarW ? sidebarW : currentDetailW;
 
       const onMove = (ev: MouseEvent) => {
         const dx = ev.clientX - startX;
@@ -70,16 +72,20 @@ export default function ResizableLayout({
 
   const dragDetail = useCallback(
     (e: React.MouseEvent) => {
-      startDrag(e, setDetailW, (dx, cw, cur) => {
-        const maxDetail = cw - sidebarW - MIN_FEED - 8; // 8px for the two resizer gutters
+      startDrag(e, setDetailW as (w: number) => void, (dx, cw, cur) => {
+        const maxDetail = cw - sidebarW - MIN_FEED - 8;
         return Math.max(MIN_DETAIL, Math.min(maxDetail, cur - dx));
       });
     },
     [startDrag, sidebarW],
   );
 
+  // When detailW is null, rely on CSS fr units (defined in .main) for the
+  // detail column — no JS sizing, no flash. Once the user drags, switch to px.
   const columns = showDetail
-    ? `${sidebarW}px 4px 1fr 4px ${detailW}px`
+    ? detailW !== null
+      ? `${sidebarW}px 4px 1fr 4px ${detailW}px`
+      : `${sidebarW}px 4px 1fr 4px 1.4fr`
     : `${sidebarW}px 4px 1fr`;
 
   return (

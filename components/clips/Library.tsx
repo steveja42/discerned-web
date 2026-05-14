@@ -6,7 +6,7 @@
 
 import { useState, useMemo } from 'react';
 import { useLibraryBridge } from '@/hooks/useLibraryBridge';
-import { CATEGORIES, INTEREST_LEVELS } from '@/lib/constants';
+import { CATEGORIES, INTEREST_LEVELS, ETHICS_LEVELS, interestRank, ethicsRank } from '@/lib/constants';
 import type { GlyphVariant } from '@/components/glyph/Glyph';
 import ClipRow from '@/components/feed/ClipRow';
 import DetailPanel from '@/components/feed/DetailPanel';
@@ -18,13 +18,17 @@ interface SidebarLocalProps {
   setActiveCat: (c: string | null) => void;
   catCounts: Record<string, number>;
   totalCount: number;
+  interestMin: number;
+  setInterestMin: (n: number) => void;
+  ethicsMin: number;
+  setEthicsMin: (n: number) => void;
 }
 
-function SidebarLocal({ activeCat, setActiveCat, catCounts, totalCount }: SidebarLocalProps) {
+function SidebarLocal({ activeCat, setActiveCat, catCounts, totalCount, interestMin, setInterestMin, ethicsMin, setEthicsMin }: SidebarLocalProps) {
   return (
     <aside className="sidebar">
+      <div className="side-section-label" style={{ fontSize: '1.25rem', fontFamily: 'var(--serif)', fontStyle: 'italic', fontWeight: 700, letterSpacing: 0, textTransform: 'none', color: 'var(--ink)', marginBottom: '0.3rem' }}>Library</div>
       <div>
-        <div className="side-section-label">View</div>
         <ul className="nav-list">
           <li
             className={`nav-item ${activeCat === null ? 'active' : ''}`}
@@ -66,12 +70,47 @@ function SidebarLocal({ activeCat, setActiveCat, catCounts, totalCount }: Sideba
         <div className="side-section-label">Filter by dimension</div>
         <div className="axis-filter">
           <div className="axis-filter-head">
-            <span>Interest</span>
+            <span>
+              Interest{' '}
+              <span style={{ color: 'var(--ink-4)', fontWeight: 400, fontFamily: 'var(--mono)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                {interestMin === 0 ? '—' : `≥ ${INTEREST_LEVELS[interestMin - 1]}`}
+              </span>
+            </span>
             <span className="axis-letter">I</span>
           </div>
           <div className="axis-range">
             {INTEREST_LEVELS.map((lvl, i) => (
-              <div key={lvl} className="pip" title={lvl}>{lvl[0]}</div>
+              <div
+                key={lvl}
+                className={`pip ${i + 1 <= interestMin ? 'active interest' : ''}`}
+                onClick={() => setInterestMin(i + 1 === interestMin ? 0 : i + 1)}
+                title={lvl}
+              >
+                {lvl[0]}
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="axis-filter">
+          <div className="axis-filter-head">
+            <span>
+              Ethics{' '}
+              <span style={{ color: 'var(--ink-4)', fontWeight: 400, fontFamily: 'var(--mono)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                {ethicsMin === 0 ? '—' : `≥ ${ETHICS_LEVELS[ethicsMin - 1]}`}
+              </span>
+            </span>
+            <span className="axis-letter">E</span>
+          </div>
+          <div className="axis-range">
+            {ETHICS_LEVELS.map((lvl, i) => (
+              <div
+                key={lvl}
+                className={`pip ${i + 1 <= ethicsMin ? 'active ethics' : ''}`}
+                onClick={() => setEthicsMin(i + 1 === ethicsMin ? 0 : i + 1)}
+                title={lvl}
+              >
+                {lvl[0]}
+              </div>
             ))}
           </div>
         </div>
@@ -88,11 +127,17 @@ interface LibraryProps {
 export default function Library({ glyphVariant = 'bars', initialClipId }: LibraryProps) {
   const { bridgePresent, clips, timedOut } = useLibraryBridge();
   const [activeCat, setActiveCat] = useState<string | null>(null);
+  const [interestMin, setInterestMin] = useState(0);
+  const [ethicsMin, setEthicsMin] = useState(0);
   const [selectedId, setSelectedId] = useState<string | null>(initialClipId ?? null);
 
   const filtered = useMemo(() =>
-    clips.filter((c) => !activeCat || c.evaluation.category === activeCat),
-    [clips, activeCat],
+    clips.filter((c) =>
+      (!activeCat || c.evaluation.category === activeCat) &&
+      interestRank(c.evaluation.interest) + 1 >= interestMin &&
+      ethicsRank(c.evaluation.ethics) + 1 >= ethicsMin,
+    ),
+    [clips, activeCat, interestMin, ethicsMin],
   );
 
   const selected = filtered.find((c) => c.capture.id === selectedId) ?? filtered[0] ?? null;
@@ -107,29 +152,12 @@ export default function Library({ glyphVariant = 'bars', initialClipId }: Librar
 
   const feedContent = (
     <main className="feed-col">
-      <div className="feed-head">
-        <div>
-          <h1 className="feed-title">
-            {activeCat
-              ? <>{CATEGORIES[activeCat]?.label ?? activeCat} </>
-              : <>Your <em>Library</em></>}
-          </h1>
-          <div className="feed-meta">
-            {clips.length} clips
-            <span className="sep">·</span>
-            stored locally · IndexedDB
-            <span className="sep">·</span>
-            {bridgePresent ? 'extension connected' : 'private'}
-          </div>
-        </div>
-      </div>
-
       {showEmpty ? (
         <LibraryEmpty />
       ) : !bridgePresent ? (
         <div className="feed-empty">Waiting for extension…</div>
       ) : filtered.length === 0 ? (
-        <div className="feed-empty">No clips in this folder.</div>
+        <div className="feed-empty">No clips match these filters.</div>
       ) : (
         <div className="feed-list">
           {filtered.map((clip, i) => (
@@ -161,12 +189,15 @@ export default function Library({ glyphVariant = 'bars', initialClipId }: Librar
             setActiveCat={setActiveCat}
             catCounts={catCounts}
             totalCount={clips.length}
+            interestMin={interestMin}
+            setInterestMin={setInterestMin}
+            ethicsMin={ethicsMin}
+            setEthicsMin={setEthicsMin}
           />
         }
         feed={feedContent}
         detail={<DetailPanel clip={selected} onClose={() => setSelectedId(null)} />}
         initialSidebarWidth={200}
-        initialDetailWidth={320}
       />
     </div>
   );

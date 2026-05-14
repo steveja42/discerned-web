@@ -31,7 +31,7 @@ function formatDate(ts: number): string {
   return new Date(ts).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 }
 
-export default function DetailPanel({ clip, onClose }: DetailPanelProps) {
+export default function DetailPanel({ clip }: DetailPanelProps) {
   if (!clip) {
     return (
       <aside className="detail">
@@ -59,52 +59,30 @@ export default function DetailPanel({ clip, onClose }: DetailPanelProps) {
         <div className="detail-source">
           <span className="fav" style={{ background: favColor(domain) }}>{favLetter(domain)}</span>
           <span className="domain">{domain}</span>
-          <span style={{ color: 'var(--ink-4)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>
+          <a
+            href={capture.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="detail-url"
+            title={capture.url}
+          >
             {capture.url}
-          </span>
-          <button className="detail-close" onClick={onClose} aria-label="Close">
-            <svg className="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
-          </button>
+          </a>
+          <span className="detail-byline">{formatDate(capture.timestamp)}</span>
         </div>
         <h2 className="detail-title">{capture.title}</h2>
-        <div className="detail-byline">{formatDate(capture.timestamp)}</div>
       </div>
 
-      {(capture.bodyHtml || capture.selectionText) ? (
-        <div className="detail-section">
-          <div className="detail-section-label">Highlighted excerpt</div>
-          <iframe
-            className="clip-frame"
-            srcDoc={capture.bodyHtml ?? capture.selectionText}
-            sandbox="allow-same-origin"
-            title="Clip content"
-          />
-          {capture.note && (
-            <div style={{ marginTop: 16, paddingTop: 14, borderTop: '1px solid var(--rule-soft)' }}>
-              <div className="detail-section-label" style={{ marginBottom: 8 }}>Note</div>
-              <p style={{ margin: 0, fontFamily: 'var(--sans)', fontSize: 13.5, lineHeight: 1.55, color: 'var(--ink-2)' }}>{capture.note}</p>
-            </div>
-          )}
-        </div>
-      ) : capture.bodyText ? (
-        <div className="detail-section">
-          <div className="detail-section-label">Highlighted excerpt</div>
-          <blockquote className="detail-excerpt">{capture.bodyText}</blockquote>
-          {capture.note && (
-            <div style={{ marginTop: 16, paddingTop: 14, borderTop: '1px solid var(--rule-soft)' }}>
-              <div className="detail-section-label" style={{ marginBottom: 8 }}>Note</div>
-              <p style={{ margin: 0, fontFamily: 'var(--sans)', fontSize: 13.5, lineHeight: 1.55, color: 'var(--ink-2)' }}>{capture.note}</p>
-            </div>
-          )}
-        </div>
-      ) : null}
-
       <div className="detail-section">
-        <div className="detail-section-label">Assessment</div>
+        <div className="detail-section-header">
+          <div className="detail-section-label">Assessment</div>
+          <div className="detail-cat-inline">
+            <span className="swatch-lg" style={{ background: `oklch(0.50 0.08 ${cat.hue})` }} />
+            <span className="cat-name">{cat.label}</span>
+          </div>
+        </div>
         <div className="axis-display">
-          <div className="axis-large">
+          <div className="axis-large" style={iIdx === 1 ? { opacity: 0.42 } : undefined}>
             <div className="axis-name">
               Interest
               <small>{INTEREST_LEVELS[0]} → {INTEREST_LEVELS[4]}</small>
@@ -118,7 +96,7 @@ export default function DetailPanel({ clip, onClose }: DetailPanelProps) {
               {evaluation.interest}
             </div>
           </div>
-          <div className="axis-large">
+          <div className="axis-large" style={eIdx === 2 ? { opacity: 0.42 } : undefined}>
             <div className="axis-name">
               Ethics
               <small>{ETHICS_LEVELS[0]} → {ETHICS_LEVELS[4]}</small>
@@ -132,18 +110,36 @@ export default function DetailPanel({ clip, onClose }: DetailPanelProps) {
               {evaluation.ethics}
             </div>
           </div>
-          <div className="cat-large">
-            <span className="swatch-lg" style={{ background: `oklch(0.50 0.08 ${cat.hue})` }} />
-            <span className="cat-name">{cat.label}</span>
-            <span className="cat-meta">Category</span>
-          </div>
         </div>
       </div>
 
-      <div className="detail-actions">
-        <button className="btn primary">Open source</button>
-        <button className="btn ghost" style={{ marginLeft: 'auto' }}>···</button>
-      </div>
+      {(capture.bodyHtml || capture.selectionText) ? (
+        <>
+          {capture.note && (
+            <div className="detail-section detail-note-row">
+              <div className="detail-section-label">Note</div>
+              <p style={{ margin: 0, fontFamily: 'var(--sans)', fontSize: 13.5, lineHeight: 1.55, color: 'var(--ink-2)' }}>{capture.note}</p>
+            </div>
+          )}
+          <div
+            className="clip-body"
+            dangerouslySetInnerHTML={{ __html: capture.bodyHtml ?? capture.selectionText ?? '' }}
+          />
+        </>
+      ) : capture.bodyText ? (
+        <div className="detail-section">
+          {capture.note && (
+            <div className="detail-note-row" style={{ marginBottom: 14, paddingBottom: 14, borderBottom: '1px solid var(--rule-soft)' }}>
+              <div className="detail-section-label">Note</div>
+              <p style={{ margin: 0, fontFamily: 'var(--sans)', fontSize: 13.5, lineHeight: 1.55, color: 'var(--ink-2)' }}>{capture.note}</p>
+            </div>
+          )}
+          {capture.thumbnail && (
+            <img src={capture.thumbnail} alt="" className="detail-thumb" />
+          )}
+          <blockquote className="detail-excerpt">{capture.bodyText}</blockquote>
+        </div>
+      ) : null}
     </aside>
   );
 }

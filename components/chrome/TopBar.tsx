@@ -5,6 +5,7 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import MiniBeacon from '@/components/brand/MiniBeacon';
 import StatusDot from '@/components/auth/StatusDot';
 import type { AuthState } from '@/lib/types';
@@ -44,6 +45,11 @@ function SearchIcon() {
 }
 
 export default function TopBar({ auth, onSignIn, brandHasPopover, onBrandClick, searchPlaceholder, extensionPresent }: TopBarProps) {
+  const path = usePathname();
+  const navLink = (href: string, label: string) => (
+    <Link href={href} className={`topbar-link ${path === href ? 'topbar-link-active' : ''}`}>{label}</Link>
+  );
+
   return (
     <header className="topbar">
       <div
@@ -66,13 +72,9 @@ export default function TopBar({ auth, onSignIn, brandHasPopover, onBrandClick, 
       </div>
 
       <div className="topbar-right">
-        {extensionPresent && (
-          <Link href="/library" className="topbar-link topbar-library">
-            <span className="ext-dot" aria-hidden="true" />
-            My Library
-          </Link>
-        )}
-        <Link href="/about" className="topbar-link">About</Link>
+        {navLink('/', 'Discernments')}
+        {extensionPresent && navLink('/library', 'My Library')}
+        {navLink('/about', 'About')}
         <a
           href="https://github.com/discerned-online"
           target="_blank"
