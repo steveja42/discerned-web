@@ -261,7 +261,7 @@ export default function CastFeed({ glyphVariant = 'bars', status, clips }: CastF
           />
         }
         feed={feedContent}
-        detail={<DetailPanel clip={selected} onClose={() => setSelectedId(null)} />}
+        detail={<DetailPanel clip={selected} onDelete={() => {}} onUpdateNote={() => {}} />}
         initialSidebarWidth={200}
       />
     </div>

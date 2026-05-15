@@ -10,7 +10,10 @@ export type BridgeMessage =
   | { type: 'DISCERNED_BRIDGE_CLIPS'; clips: ClipData[] }
   | { type: 'DISCERNED_BRIDGE_NEW_CLIP'; clip: ClipData };
 
-export function listenForBridge(handler: (msg: BridgeMessage) => void): () => void {
+export function listenForBridge(
+  handler: (msg: BridgeMessage) => void,
+  clipCount = 0,
+): () => void {
   const onMessage = (e: MessageEvent) => {
     if (e.origin !== window.location.origin) return;
     if (e.source !== window) return;
@@ -20,6 +23,14 @@ export function listenForBridge(handler: (msg: BridgeMessage) => void): () => vo
     handler(e.data as BridgeMessage);
   };
   window.addEventListener('message', onMessage);
-  window.postMessage({ type: 'DISCERNED_WEB_READY' }, window.location.origin);
+  window.postMessage({ type: 'DISCERNED_WEB_READY', clipCount }, window.location.origin);
   return () => window.removeEventListener('message', onMessage);
+}
+
+export function sendDeleteClips(ids: string[]): void {
+  window.postMessage({ type: 'DISCERNED_DELETE_CLIPS', ids }, window.location.origin);
+}
+
+export function sendUpdateNote(id: string, note: string): void {
+  window.postMessage({ type: 'DISCERNED_UPDATE_NOTE', id, note }, window.location.origin);
 }

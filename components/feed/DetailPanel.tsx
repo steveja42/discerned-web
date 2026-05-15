@@ -3,13 +3,15 @@
 
 'use client';
 
+import { useState, useEffect } from 'react';
 import type { ClipData } from '@/lib/types';
 import { CATEGORIES, INTEREST_LEVELS, ETHICS_LEVELS, interestRank, ethicsRank } from '@/lib/constants';
 import { interestColor, ethicsColor } from '@/lib/dimensionColor';
 
 interface DetailPanelProps {
   clip: ClipData | null;
-  onClose: () => void;
+  onDelete: (id: string) => void;
+  onUpdateNote: (id: string, note: string) => void;
 }
 
 function domainOf(url: string): string {
@@ -31,7 +33,78 @@ function formatDate(ts: number): string {
   return new Date(ts).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 }
 
-export default function DetailPanel({ clip }: DetailPanelProps) {
+function NoteEditor({
+  note,
+  clipId,
+  onUpdateNote,
+}: {
+  note: string | undefined;
+  clipId: string;
+  onUpdateNote: (id: string, note: string) => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(note ?? '');
+
+  // Reset when clip changes.
+  useEffect(() => {
+    setEditing(false);
+    setDraft(note ?? '');
+  }, [clipId, note]);
+
+  const save = () => {
+    onUpdateNote(clipId, draft);
+    setEditing(false);
+  };
+
+  const cancel = () => {
+    setDraft(note ?? '');
+    setEditing(false);
+  };
+
+  if (editing) {
+    return (
+      <div className="note-edit-area">
+        <textarea
+          className="note-textarea"
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          autoFocus
+          rows={3}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) save();
+            if (e.key === 'Escape') cancel();
+          }}
+        />
+        <div className="note-edit-actions">
+          <button className="btn-note-save" onClick={save}>Save</button>
+          <button className="btn-note-cancel" onClick={cancel}>Cancel</button>
+        </div>
+      </div>
+    );
+  }
+
+  if (note) {
+    return (
+      <div className="note-display" onClick={() => { setDraft(note); setEditing(true); }}>
+        <p style={{ margin: 0, fontFamily: 'var(--sans)', fontSize: 13.5, lineHeight: 1.55, color: 'var(--ink-2)' }}>
+          {note}
+        </p>
+        <button className="note-edit-trigger" title="Edit note" aria-label="Edit note">✎</button>
+      </div>
+    );
+  }
+
+  return (
+    <span
+      className="note-add-prompt"
+      onClick={() => { setDraft(''); setEditing(true); }}
+    >
+      Add a note…
+    </span>
+  );
+}
+
+export default function DetailPanel({ clip, onDelete, onUpdateNote }: DetailPanelProps) {
   if (!clip) {
     return (
       <aside className="detail">
@@ -70,7 +143,24 @@ export default function DetailPanel({ clip }: DetailPanelProps) {
           </a>
           <span className="detail-byline">{formatDate(capture.timestamp)}</span>
         </div>
-        <h2 className="detail-title">{capture.title}</h2>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+          <h2 className="detail-title" style={{ flex: 1, margin: 0 }}>{capture.title}</h2>
+          <div className="detail-actions">
+            <button
+              className="btn-detail-delete"
+              onClick={() => onDelete(capture.id)}
+              title="Delete clip"
+              aria-label="Delete clip"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="3 6 5 6 21 6" />
+                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                <path d="M10 11v6M14 11v6" />
+                <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+              </svg>
+            </button>
+          </div>
+        </div>
       </div>
 
       <div className="detail-section">
@@ -113,27 +203,18 @@ export default function DetailPanel({ clip }: DetailPanelProps) {
         </div>
       </div>
 
+      <div className="detail-section detail-note-row">
+        <div className="detail-section-label">Note</div>
+        <NoteEditor note={capture.note} clipId={capture.id} onUpdateNote={onUpdateNote} />
+      </div>
+
       {(capture.bodyHtml || capture.selectionText) ? (
-        <>
-          {capture.note && (
-            <div className="detail-section detail-note-row">
-              <div className="detail-section-label">Note</div>
-              <p style={{ margin: 0, fontFamily: 'var(--sans)', fontSize: 13.5, lineHeight: 1.55, color: 'var(--ink-2)' }}>{capture.note}</p>
-            </div>
-          )}
-          <div
-            className="clip-body"
-            dangerouslySetInnerHTML={{ __html: capture.bodyHtml ?? capture.selectionText ?? '' }}
-          />
-        </>
+        <div
+          className="clip-body"
+          dangerouslySetInnerHTML={{ __html: capture.bodyHtml ?? capture.selectionText ?? '' }}
+        />
       ) : capture.bodyText ? (
         <div className="detail-section">
-          {capture.note && (
-            <div className="detail-note-row" style={{ marginBottom: 14, paddingBottom: 14, borderBottom: '1px solid var(--rule-soft)' }}>
-              <div className="detail-section-label">Note</div>
-              <p style={{ margin: 0, fontFamily: 'var(--sans)', fontSize: 13.5, lineHeight: 1.55, color: 'var(--ink-2)' }}>{capture.note}</p>
-            </div>
-          )}
           {capture.thumbnail && (
             <img src={capture.thumbnail} alt="" className="detail-thumb" />
           )}

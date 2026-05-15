@@ -3,6 +3,7 @@
 
 import type { Metadata } from 'next';
 import './globals.css';
+import { ClipStoreProvider } from '@/lib/bridge/ClipStoreContext';
 
 export const metadata: Metadata = {
   title: 'Discerned — Signal, not noise.',
@@ -12,7 +13,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className="style-editorial">{children}</body>
+      <body className="style-editorial">
+        <ClipStoreProvider>{children}</ClipStoreProvider>
+      </body>
     </html>
   );
 }

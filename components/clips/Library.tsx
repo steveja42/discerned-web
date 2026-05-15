@@ -4,13 +4,15 @@
 
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
+import type React from 'react';
 import { useLibraryBridge } from '@/hooks/useLibraryBridge';
 import { CATEGORIES, INTEREST_LEVELS, ETHICS_LEVELS, interestRank, ethicsRank } from '@/lib/constants';
 import type { GlyphVariant } from '@/components/glyph/Glyph';
 import ClipRow from '@/components/feed/ClipRow';
 import DetailPanel from '@/components/feed/DetailPanel';
 import LibraryEmpty from './LibraryEmpty';
+import BulkActionBar from './BulkActionBar';
 import ResizableLayout from '@/components/layout/ResizableLayout';
 
 interface SidebarLocalProps {
@@ -125,11 +127,12 @@ interface LibraryProps {
 }
 
 export default function Library({ glyphVariant = 'bars', initialClipId }: LibraryProps) {
-  const { bridgePresent, clips, timedOut } = useLibraryBridge();
+  const { bridgePresent, clips, timedOut, removeClips, updateClipNote } = useLibraryBridge();
   const [activeCat, setActiveCat] = useState<string | null>(null);
   const [interestMin, setInterestMin] = useState(0);
   const [ethicsMin, setEthicsMin] = useState(0);
   const [selectedId, setSelectedId] = useState<string | null>(initialClipId ?? null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   const filtered = useMemo(() =>
     clips.filter((c) =>
@@ -150,27 +153,100 @@ export default function Library({ glyphVariant = 'bars', initialClipId }: Librar
 
   const showEmpty = timedOut && !bridgePresent;
 
+  // Tracks the last clip clicked without shift, for shift-range selection.
+  const lastClickedId = useRef<string | null>(null);
+
+  const handleSelectToggle = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+    lastClickedId.current = id;
+  };
+
+  const handleRowClick = (id: string, e: React.MouseEvent) => {
+    const isCtrl = e.ctrlKey || e.metaKey;
+    const isShift = e.shiftKey;
+
+    if (isShift && lastClickedId.current) {
+      // Range select: select all clips between lastClickedId and id.
+      const ids = filtered.map((c) => c.capture.id);
+      const a = ids.indexOf(lastClickedId.current);
+      const b = ids.indexOf(id);
+      if (a !== -1 && b !== -1) {
+        const [lo, hi] = a < b ? [a, b] : [b, a];
+        const rangeIds = ids.slice(lo, hi + 1);
+        setSelectedIds((prev) => {
+          const next = new Set(prev);
+          rangeIds.forEach((rid) => next.add(rid));
+          return next;
+        });
+      }
+      return;
+    }
+
+    if (isCtrl) {
+      // Toggle this clip into/out of selection.
+      handleSelectToggle(id);
+      return;
+    }
+
+    if (selectedIds.size > 0) {
+      // In select mode: plain click toggles.
+      handleSelectToggle(id);
+      return;
+    }
+
+    // Normal click: open detail.
+    lastClickedId.current = id;
+    setSelectedId(id);
+  };
+
+  const handleBulkDelete = () => {
+    const ids = [...selectedIds];
+    removeClips(ids);
+    setSelectedIds(new Set());
+    if (selectedId && selectedIds.has(selectedId)) setSelectedId(null);
+  };
+
+  const handleSingleDelete = (id: string) => {
+    removeClips([id]);
+    if (selectedId === id) setSelectedId(null);
+  };
+
   const feedContent = (
     <main className="feed-col">
-      {showEmpty ? (
-        <LibraryEmpty />
-      ) : !bridgePresent ? (
-        <div className="feed-empty">Waiting for extension…</div>
-      ) : filtered.length === 0 ? (
-        <div className="feed-empty">No clips match these filters.</div>
-      ) : (
-        <div className="feed-list">
-          {filtered.map((clip, i) => (
-            <ClipRow
-              key={clip.capture.id ?? i}
-              clip={clip}
-              selected={selected?.capture.id === clip.capture.id}
-              onClick={() => setSelectedId(clip.capture.id)}
-              glyphVariant={glyphVariant}
-            />
-          ))}
-        </div>
-      )}
+      <div className="feed-scroll">
+        {showEmpty ? (
+          <LibraryEmpty />
+        ) : !bridgePresent ? (
+          <div className="feed-empty">Waiting for extension…</div>
+        ) : filtered.length === 0 ? (
+          <div className="feed-empty">No clips match these filters.</div>
+        ) : (
+          <div className="feed-list">
+            {filtered.map((clip, i) => (
+              <ClipRow
+                key={clip.capture.id ?? i}
+                clip={clip}
+                selected={selected?.capture.id === clip.capture.id}
+                onClick={(e) => handleRowClick(clip.capture.id, e)}
+                glyphVariant={glyphVariant}
+                isSelectMode={selectedIds.size > 0}
+                isSelected={selectedIds.has(clip.capture.id)}
+                onSelect={handleSelectToggle}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      <BulkActionBar
+        count={selectedIds.size}
+        onDelete={handleBulkDelete}
+        onClear={() => setSelectedIds(new Set())}
+      />
 
       <div className="sov-strip">
         <span className="item"><span className="ok-dot" />Local-first · IndexedDB</span>
@@ -196,7 +272,13 @@ export default function Library({ glyphVariant = 'bars', initialClipId }: Librar
           />
         }
         feed={feedContent}
-        detail={<DetailPanel clip={selected} onClose={() => setSelectedId(null)} />}
+        detail={
+          <DetailPanel
+            clip={selected}
+            onDelete={handleSingleDelete}
+            onUpdateNote={updateClipNote}
+          />
+        }
         initialSidebarWidth={200}
       />
     </div>

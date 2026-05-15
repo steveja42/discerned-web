@@ -669,11 +669,15 @@ a { color: inherit; }
 }
 
 /* Feed list */
-.feed-list {
-  display: flex; flex-direction: column;
+.feed-scroll {
   flex: 1;
   overflow-y: auto;
   scrollbar-color: var(--rule) transparent;
+  min-height: 0;
+}
+
+.feed-list {
+  display: flex; flex-direction: column;
 }
 
 /* Clip row */
@@ -1284,3 +1288,193 @@ a { color: inherit; }
   width: auto; padding: 0 8px;
   letter-spacing: 0.06em;
 }
+
+/* ── Clip select mode & checkbox ─────────────────────────────────────────── */
+
+.clip-checkbox-wrap {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  opacity: 0;
+  transition: opacity 120ms;
+  z-index: 2;
+}
+/* Reserve left space always so the checkbox doesn't shift content on hover */
+.clip { padding-left: 44px; }
+/* Show checkbox on hover, when in select mode, or when already checked */
+.clip:hover .clip-checkbox-wrap,
+.clip.select-mode .clip-checkbox-wrap,
+.clip.checked .clip-checkbox-wrap { opacity: 1; }
+.clip.checked { background: color-mix(in oklch, var(--accent) 10%, var(--paper)); }
+
+.clip-checkbox-wrap input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+  cursor: pointer;
+  margin: 0;
+}
+
+/* ── Bulk action bar ─────────────────────────────────────────────────────── */
+.bulk-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 20px;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--sans);
+  font-size: 13px;
+  border-top: 0px solid var(--ink-2);
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 200ms cubic-bezier(0.4, 0, 0.2, 1),
+              padding 200ms cubic-bezier(0.4, 0, 0.2, 1),
+              border-top-width 0ms 200ms;
+  flex-shrink: 0;
+}
+.bulk-bar.visible {
+  max-height: 56px;
+  padding: 10px 20px;
+  border-top-width: 1px;
+  transition: max-height 200ms cubic-bezier(0.4, 0, 0.2, 1),
+              padding 200ms cubic-bezier(0.4, 0, 0.2, 1),
+              border-top-width 0ms;
+}
+.bulk-bar .bulk-count { flex: 1; font-weight: 500; color: var(--paper); }
+.bulk-bar .btn-bulk-delete {
+  background: oklch(0.45 0.18 25);
+  color: var(--paper);
+  border: none;
+  padding: 7px 14px;
+  border-radius: 5px;
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 120ms;
+}
+.bulk-bar .btn-bulk-delete:hover { background: oklch(0.35 0.18 25); }
+.bulk-bar .btn-bulk-cancel {
+  background: transparent;
+  color: oklch(0.75 0 0);
+  border: 1px solid oklch(0.45 0 0);
+  padding: 7px 12px;
+  border-radius: 5px;
+  font: inherit;
+  cursor: pointer;
+  transition: border-color 120ms;
+}
+.bulk-bar .btn-bulk-cancel:hover { border-color: oklch(0.65 0 0); }
+
+/* ── Detail panel — delete button ───────────────────────────────────────── */
+.detail-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+.btn-detail-delete {
+  background: transparent;
+  border: 1px solid var(--rule);
+  color: var(--ink-3);
+  width: 30px;
+  height: 30px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: color 120ms, border-color 120ms, background 120ms;
+  flex-shrink: 0;
+}
+.btn-detail-delete:hover {
+  color: oklch(0.45 0.18 25);
+  border-color: oklch(0.55 0.18 25);
+  background: oklch(0.97 0.01 25);
+}
+
+/* ── Note editor in DetailPanel ─────────────────────────────────────────── */
+.note-display {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  cursor: pointer;
+}
+.note-display p { margin: 0; flex: 1; }
+.note-edit-trigger {
+  opacity: 0;
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: var(--ink-4);
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: opacity 120ms, color 120ms;
+}
+.note-display:hover .note-edit-trigger { opacity: 1; }
+.note-edit-trigger:hover { color: var(--accent-ink); }
+
+.note-add-prompt {
+  font-family: var(--sans);
+  font-size: 12.5px;
+  color: var(--ink-4);
+  font-style: italic;
+  cursor: pointer;
+  padding: 2px 0;
+  display: inline-block;
+}
+.note-add-prompt:hover { color: var(--accent-ink); }
+
+.note-edit-area { display: flex; flex-direction: column; gap: 8px; }
+.note-textarea {
+  width: 100%;
+  font-family: var(--sans);
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--ink-2);
+  background: var(--paper-2);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 8px 10px;
+  resize: vertical;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 120ms;
+  min-height: 72px;
+}
+.note-textarea:focus { border-color: var(--accent); }
+.note-edit-actions { display: flex; gap: 8px; }
+.btn-note-save {
+  background: var(--accent);
+  color: var(--paper);
+  border: none;
+  padding: 6px 14px;
+  border-radius: 5px;
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 120ms;
+}
+.btn-note-save:hover { background: var(--accent-ink); }
+.btn-note-cancel {
+  background: transparent;
+  color: var(--ink-3);
+  border: 1px solid var(--rule);
+  padding: 6px 12px;
+  border-radius: 5px;
+  font-family: var(--sans);
+  font-size: 13px;
+  cursor: pointer;
+  transition: border-color 120ms;
+}
+.btn-note-cancel:hover { border-color: var(--ink-3); }

@@ -4,14 +4,18 @@
 
 'use client';
 
+import type React from 'react';
 import type { ClipData } from '@/lib/types';
 import Glyph, { type GlyphVariant } from '@/components/glyph/Glyph';
 
 interface ClipRowProps {
   clip: ClipData;
   selected: boolean;
-  onClick: () => void;
+  onClick: (e: React.MouseEvent) => void;
   glyphVariant?: GlyphVariant;
+  isSelectMode?: boolean;
+  isSelected?: boolean;
+  onSelect?: (id: string) => void;
 }
 
 function formatDate(ts: number): string {
@@ -33,12 +37,31 @@ function favColor(domain: string): string {
   return `oklch(0.30 0.08 ${hue})`;
 }
 
-export default function ClipRow({ clip, selected, onClick, glyphVariant = 'bars' }: ClipRowProps) {
+export default function ClipRow({
+  clip, selected, onClick, glyphVariant = 'bars',
+  isSelectMode = false, isSelected = false, onSelect,
+}: ClipRowProps) {
   const { capture, evaluation } = clip;
   const domain = domainOf(capture.url);
 
+  const handleCheckboxClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onSelect?.(capture.id);
+  };
+
   return (
-    <article className={`clip ${selected ? 'selected' : ''}`} onClick={onClick}>
+    <article
+      className={`clip${selected ? ' selected' : ''}${isSelectMode ? ' select-mode' : ''}${isSelected ? ' checked' : ''}`}
+      onClick={onClick}
+    >
+      <span className="clip-checkbox-wrap" onClick={handleCheckboxClick}>
+        <input
+          type="checkbox"
+          checked={isSelected}
+          onChange={() => { /* controlled via onClick */ }}
+          tabIndex={-1}
+        />
+      </span>
       <div className="clip-main">
         <div className="clip-source">
           <span className="fav" style={{ background: favColor(domain) }}>{favLetter(domain)}</span>

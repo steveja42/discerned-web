@@ -1,56 +1,44 @@
-// Listens for the Discerned extension bridge on the /library page.
-// Sets bridgePresent when DISCERNED_BRIDGE_HELLO arrives and populates clips
-// from DISCERNED_BRIDGE_CLIPS. After 2 seconds without a HELLO, sets timedOut
-// so the page can show the extension install prompt instead of a spinner.
+// Connects the /library page to the Discerned extension bridge.
+// Reads and writes clip state via ClipStoreContext so clips persist across
+// navigation without being re-fetched from the extension on every mount.
 
 'use client';
 
-import { useState, useEffect } from 'react';
-import type { ClipData } from '@/lib/types';
+import { useEffect, useRef } from 'react';
+import { useClipStore } from '@/lib/bridge/ClipStoreContext';
 import { listenForBridge } from '@/lib/bridge/extension-bridge';
 
-interface BridgeState {
-  bridgePresent: boolean;
-  pubkey: string | null;
-  authMethod: string | null;
-  clips: ClipData[];
-  timedOut: boolean;
-}
-
 export function useLibraryBridge() {
-  const [state, setState] = useState<BridgeState>({
-    bridgePresent: false,
-    pubkey: null,
-    authMethod: null,
-    clips: [],
-    timedOut: false,
-  });
+  const store = useClipStore();
+  const { clips, bridgePresent, pubkey, authMethod, timedOut,
+          setClips, prependClip, setBridgePresent, setTimedOut,
+          removeClips, updateClipNote } = store;
+
+  // Capture clip count at mount time so listenForBridge sends the right count
+  // in DISCERNED_WEB_READY even though the effect dep array is empty.
+  const mountClipCount = useRef(clips.length);
 
   useEffect(() => {
     const cleanup = listenForBridge((msg) => {
       if (msg.type === 'DISCERNED_BRIDGE_HELLO') {
-        setState((s) => ({ ...s, bridgePresent: true, pubkey: msg.pubkey, authMethod: msg.authMethod }));
+        setBridgePresent(msg.pubkey, msg.authMethod);
       }
       if (msg.type === 'DISCERNED_BRIDGE_CLIPS') {
-        setState((s) => ({ ...s, clips: msg.clips }));
+        setClips(msg.clips);
       }
       if (msg.type === 'DISCERNED_BRIDGE_NEW_CLIP') {
-        setState((s) => {
-          if (s.clips.some((c) => c.capture.id === msg.clip.capture.id)) return s;
-          return { ...s, clips: [msg.clip, ...s.clips] };
-        });
+        prependClip(msg.clip);
       }
-    });
+    }, mountClipCount.current);
 
-    const timer = setTimeout(() => {
-      setState((s) => s.bridgePresent ? s : { ...s, timedOut: true });
-    }, 2000);
+    const timer = setTimeout(setTimedOut, 2000);
 
     return () => {
       cleanup();
       clearTimeout(timer);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return state;
+  return { bridgePresent, pubkey, authMethod, clips, timedOut, removeClips, updateClipNote };
 }
