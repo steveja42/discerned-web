@@ -4,7 +4,7 @@
 
 'use client';
 
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import type React from 'react';
 import { useLibraryBridge } from '@/hooks/useLibraryBridge';
 import { CATEGORIES, INTEREST_LEVELS, ETHICS_LEVELS, interestRank, ethicsRank } from '@/lib/constants';
@@ -127,7 +127,14 @@ interface LibraryProps {
 }
 
 export default function Library({ glyphVariant = 'bars', initialClipId }: LibraryProps) {
-  const { bridgePresent, clips, timedOut, removeClips, updateClipNote } = useLibraryBridge();
+  const { bridgePresent, clips, timedOut, removeClips, updateClipNote, focusClipId, clearFocusClipId } = useLibraryBridge();
+
+  useEffect(() => {
+    if (focusClipId) {
+      setSelectedId(focusClipId);
+      clearFocusClipId();
+    }
+  }, [focusClipId, clearFocusClipId]);
   const [activeCat, setActiveCat] = useState<string | null>(null);
   const [interestMin, setInterestMin] = useState(0);
   const [ethicsMin, setEthicsMin] = useState(0);

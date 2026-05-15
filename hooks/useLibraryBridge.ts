@@ -4,7 +4,7 @@
 
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useClipStore } from '@/lib/bridge/ClipStoreContext';
 import { listenForBridge } from '@/lib/bridge/extension-bridge';
 
@@ -13,6 +13,10 @@ export function useLibraryBridge() {
   const { clips, bridgePresent, pubkey, authMethod, timedOut,
           setClips, prependClip, setBridgePresent, setTimedOut,
           removeClips, updateClipNote } = store;
+
+  // Clip ID requested by the extension (e.g. "View in Library" after clipping).
+  // Library consumes this once via useEffect to set selectedId.
+  const [focusClipId, setFocusClipId] = useState<string | null>(null);
 
   // Capture clip count at mount time so listenForBridge sends the right count
   // in DISCERNED_WEB_READY even though the effect dep array is empty.
@@ -29,6 +33,9 @@ export function useLibraryBridge() {
       if (msg.type === 'DISCERNED_BRIDGE_NEW_CLIP') {
         prependClip(msg.clip);
       }
+      if (msg.type === 'DISCERNED_BRIDGE_FOCUS_CLIP') {
+        setFocusClipId(msg.clipId);
+      }
     }, mountClipCount.current);
 
     const timer = setTimeout(setTimedOut, 2000);
@@ -40,5 +47,5 @@ export function useLibraryBridge() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return { bridgePresent, pubkey, authMethod, clips, timedOut, removeClips, updateClipNote };
+  return { bridgePresent, pubkey, authMethod, clips, timedOut, removeClips, updateClipNote, focusClipId, clearFocusClipId: () => setFocusClipId(null) };
 }
