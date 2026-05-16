@@ -125,6 +125,9 @@ export default function DetailPanel({ clip, onDelete, onUpdateNote }: DetailPane
   const cat = CATEGORIES[evaluation.category] ?? { label: evaluation.category, hue: 60 };
   const iIdx = interestRank(evaluation.interest);
   const eIdx = ethicsRank(evaluation.ethics);
+  const iNeutral = iIdx === 1;
+  const eNeutral = eIdx === 2;
+  const showAssessment = !iNeutral || !eNeutral;
 
   return (
     <aside className="detail">
@@ -164,44 +167,53 @@ export default function DetailPanel({ clip, onDelete, onUpdateNote }: DetailPane
       </div>
 
       <div className="detail-section">
-        <div className="detail-section-header">
-          <div className="detail-section-label">Assessment</div>
-          <div className="detail-cat-inline">
-            <span className="swatch-lg" style={{ background: `oklch(0.50 0.08 ${cat.hue})` }} />
-            <span className="cat-name">{cat.label}</span>
-          </div>
-        </div>
-        <div className="axis-display">
-          <div className="axis-large" style={iIdx === 1 ? { opacity: 0.42 } : undefined}>
-            <div className="axis-name">
-              Interest
-              <small>{INTEREST_LEVELS[0]} → {INTEREST_LEVELS[4]}</small>
-            </div>
-            <div className="axis-track">
-              {INTEREST_LEVELS.map((lvl, i) => (
-                <div key={lvl} className={`seg ${i <= iIdx ? 'on interest' : ''}`} title={lvl} style={i === iIdx ? { background: interestColor(i, 1, 4) } : undefined} />
-              ))}
-            </div>
-            <div className="axis-num" style={{ fontSize: 11, fontFamily: 'var(--mono)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-              {evaluation.interest}
-            </div>
-          </div>
-          <div className="axis-large" style={eIdx === 2 ? { opacity: 0.42 } : undefined}>
-            <div className="axis-name">
-              Ethics
-              <small>{ETHICS_LEVELS[0]} → {ETHICS_LEVELS[4]}</small>
-            </div>
-            <div className="axis-track">
-              {ETHICS_LEVELS.map((lvl, i) => (
-                <div key={lvl} className={`seg ${i <= eIdx ? 'on ethics' : ''}`} title={lvl} style={i === eIdx ? { background: ethicsColor(i, 2, 4) } : undefined} />
-              ))}
-            </div>
-            <div className="axis-num" style={{ fontSize: 11, fontFamily: 'var(--mono)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-              {evaluation.ethics}
-            </div>
-          </div>
+        <div className="detail-cat-inline">
+          <span className="swatch-lg" style={{ background: `oklch(0.50 0.08 ${cat.hue})` }} />
+          <span className="cat-name">{cat.label}</span>
         </div>
       </div>
+
+      {showAssessment && (
+        <div className="detail-section">
+          <div className="detail-section-header">
+            <div className="detail-section-label">Assessment</div>
+          </div>
+          <div className="axis-display">
+            {!iNeutral && (
+              <div className="axis-large">
+                <div className="axis-name">
+                  Interest
+                  <small>{INTEREST_LEVELS[0]} → {INTEREST_LEVELS[4]}</small>
+                </div>
+                <div className="axis-track">
+                  {INTEREST_LEVELS.map((lvl, i) => (
+                    <div key={lvl} className={`seg ${i <= iIdx ? 'on interest' : ''}`} title={lvl} style={i === iIdx ? { background: interestColor(i, 1, 4) } : undefined} />
+                  ))}
+                </div>
+                <div className="axis-num" style={{ fontSize: 11, fontFamily: 'var(--mono)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  {evaluation.interest}
+                </div>
+              </div>
+            )}
+            {!eNeutral && (
+              <div className="axis-large">
+                <div className="axis-name">
+                  Ethics
+                  <small>{ETHICS_LEVELS[0]} → {ETHICS_LEVELS[4]}</small>
+                </div>
+                <div className="axis-track">
+                  {ETHICS_LEVELS.map((lvl, i) => (
+                    <div key={lvl} className={`seg ${i <= eIdx ? 'on ethics' : ''}`} title={lvl} style={i === eIdx ? { background: ethicsColor(i, 2, 4) } : undefined} />
+                  ))}
+                </div>
+                <div className="axis-num" style={{ fontSize: 11, fontFamily: 'var(--mono)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  {evaluation.ethics}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       <div className="detail-section detail-note-row">
         <div className="detail-section-label">Note</div>

@@ -25,19 +25,24 @@ export default function GlyphRadial({ interest, ethics, category }: GlyphRadialP
     return `M ${cx} ${cy - radius} A ${radius} ${radius} 0 ${large} 1 ${x} ${y}`;
   };
 
+  const iNeutral = iRank === 1;
+  const eNeutral = eRank === 2;
+
   return (
     <div className="glyph" style={{ alignItems: 'center', minWidth: 80 }}>
-      <svg width="64" height="64" viewBox="0 0 64 64">
-        <circle cx={cx} cy={cy} r={r} fill="none" stroke="var(--rule)" strokeWidth="1.5" />
-        <circle cx={cx} cy={cy} r={r - 7} fill="none" stroke="var(--rule)" strokeWidth="1.5" />
-        <path d={arc(r, iAngle)} fill="none" stroke={iColor} strokeWidth="3" strokeLinecap="round" />
-        <path d={arc(r - 7, eAngle)} fill="none" stroke={eColor} strokeWidth="3" strokeLinecap="round" />
-        <circle cx={cx} cy={cy} r="3" fill={`oklch(0.50 0.08 ${cat.hue})`} />
-      </svg>
-      <div className="cat-tag" style={{ marginTop: 4 }}>
+      <div className="cat-tag" style={{ marginBottom: 4 }}>
         <span className="swatch" style={{ background: `oklch(0.50 0.08 ${cat.hue})` }} />
         {cat.label}
       </div>
+      {(!iNeutral || !eNeutral) && (
+        <svg width="64" height="64" viewBox="0 0 64 64">
+          <circle cx={cx} cy={cy} r={r} fill="none" stroke="var(--rule)" strokeWidth="1.5" />
+          <circle cx={cx} cy={cy} r={r - 7} fill="none" stroke="var(--rule)" strokeWidth="1.5" />
+          {!iNeutral && <path d={arc(r, iAngle)} fill="none" stroke={iColor} strokeWidth="3" strokeLinecap="round" />}
+          {!eNeutral && <path d={arc(r - 7, eAngle)} fill="none" stroke={eColor} strokeWidth="3" strokeLinecap="round" />}
+          <circle cx={cx} cy={cy} r="3" fill={`oklch(0.50 0.08 ${cat.hue})`} />
+        </svg>
+      )}
     </div>
   );
 }
