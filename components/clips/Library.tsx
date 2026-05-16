@@ -167,10 +167,13 @@ export default function Library({ glyphVariant = 'bars', initialClipId }: Librar
   const [jsonImportOpen, setJsonImportOpen] = useState(false);
 
   useEffect(() => {
-    if (focusClipId) {
-      setSelectedId(focusClipId);
-      clearFocusClipId();
-    }
+    if (!focusClipId) return;
+    const clip = clips.find((c) => c.capture.id === focusClipId);
+    if (clip && activeCat !== null) setActiveCat(clip.evaluation.category);
+    setSelectedId(focusClipId);
+    clearFocusClipId();
+  // clips intentionally omitted — we only want this to fire when focusClipId changes
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [focusClipId, clearFocusClipId]);
   const [activeCat, setActiveCat] = useState<string | null>(null);
   const [interestMin, setInterestMin] = useState(0);
