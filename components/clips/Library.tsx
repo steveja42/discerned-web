@@ -8,12 +8,20 @@ import { useState, useMemo, useRef, useEffect } from 'react';
 import type React from 'react';
 import { useLibraryBridge } from '@/hooks/useLibraryBridge';
 import { CATEGORIES, INTEREST_LEVELS, ETHICS_LEVELS, interestRank, ethicsRank } from '@/lib/constants';
+
+function categoryHue(name: string): number {
+  let h = 0;
+  for (const c of name) h = (h * 31 + c.charCodeAt(0)) | 0;
+  return Math.abs(h) % 360;
+}
 import type { GlyphVariant } from '@/components/glyph/Glyph';
 import ClipRow from '@/components/feed/ClipRow';
 import DetailPanel from '@/components/feed/DetailPanel';
 import LibraryEmpty from './LibraryEmpty';
 import BulkActionBar from './BulkActionBar';
 import ResizableLayout from '@/components/layout/ResizableLayout';
+import { ImportDialog } from './ImportDialog';
+import { exportClipsJson, exportClipsCsv } from '@/lib/export-utils';
 
 interface SidebarLocalProps {
   activeCat: string | null;
@@ -24,9 +32,10 @@ interface SidebarLocalProps {
   setInterestMin: (n: number) => void;
   ethicsMin: number;
   setEthicsMin: (n: number) => void;
+  allCategories: Record<string, { label: string; hue: number }>;
 }
 
-function SidebarLocal({ activeCat, setActiveCat, catCounts, totalCount, interestMin, setInterestMin, ethicsMin, setEthicsMin }: SidebarLocalProps) {
+function SidebarLocal({ activeCat, setActiveCat, catCounts, totalCount, interestMin, setInterestMin, ethicsMin, setEthicsMin, allCategories }: SidebarLocalProps) {
   return (
     <aside className="sidebar">
       <div className="side-section-label" style={{ fontSize: '1.25rem', fontFamily: 'var(--serif)', fontStyle: 'italic', fontWeight: 700, letterSpacing: 0, textTransform: 'none', color: 'var(--ink)', marginBottom: '0.3rem' }}>Library</div>
@@ -43,10 +52,10 @@ function SidebarLocal({ activeCat, setActiveCat, catCounts, totalCount, interest
 
       <div>
         <div className="side-section-label">
-          Folders <span className="count">{Object.keys(CATEGORIES).length}</span>
+          Folders <span className="count">{Object.keys(allCategories).length}</span>
         </div>
         <ul className="nav-list folder-list">
-          {Object.entries(CATEGORIES).map(([key, cat]) => {
+          {Object.entries(allCategories).map(([key, cat]) => {
             const c = catCounts[key] ?? 0;
             const active = activeCat === key;
             return (
@@ -127,7 +136,8 @@ interface LibraryProps {
 }
 
 export default function Library({ glyphVariant = 'bars', initialClipId }: LibraryProps) {
-  const { bridgePresent, clips, timedOut, removeClips, updateClipNote, focusClipId, clearFocusClipId } = useLibraryBridge();
+  const { bridgePresent, clips, timedOut, customCategories, removeClips, updateClipNote, addClips, addCustomCategories, focusClipId, clearFocusClipId } = useLibraryBridge();
+  const [importOpen, setImportOpen] = useState(false);
 
   useEffect(() => {
     if (focusClipId) {
@@ -157,6 +167,14 @@ export default function Library({ glyphVariant = 'bars', initialClipId }: Librar
     clips.forEach((c) => { m[c.evaluation.category] = (m[c.evaluation.category] ?? 0) + 1; });
     return m;
   }, [clips]);
+
+  const allCategories = useMemo(() => {
+    const custom: Record<string, { label: string; hue: number }> = {};
+    customCategories.forEach((cat) => {
+      custom[cat] = { label: cat, hue: categoryHue(cat) };
+    });
+    return { ...CATEGORIES, ...custom };
+  }, [customCategories]);
 
   const showEmpty = timedOut && !bridgePresent;
 
@@ -258,13 +276,24 @@ export default function Library({ glyphVariant = 'bars', initialClipId }: Librar
       <div className="sov-strip">
         <span className="item"><span className="ok-dot" />Local-first · IndexedDB</span>
         <span className="spacer" />
-        <span className="item"><a>Export JSON</a></span>
+        <span className="item"><a onClick={() => setImportOpen(true)} style={{ cursor: 'pointer' }}>Import</a></span>
+        <span className="item"><a onClick={() => exportClipsJson(clips)} style={{ cursor: 'pointer' }}>Export JSON</a></span>
+        <span className="item"><a onClick={() => exportClipsCsv(clips)} style={{ cursor: 'pointer' }}>Export CSV</a></span>
       </div>
     </main>
   );
 
   return (
     <div className="app">
+      {importOpen && (
+        <ImportDialog
+          bridgePresent={bridgePresent}
+          existingCustomCategories={customCategories}
+          onClose={() => setImportOpen(false)}
+          onClipsImported={addClips}
+          onCategoriesCreated={addCustomCategories}
+        />
+      )}
       <ResizableLayout
         sidebar={
           <SidebarLocal
@@ -276,6 +305,7 @@ export default function Library({ glyphVariant = 'bars', initialClipId }: Librar
             setInterestMin={setInterestMin}
             ethicsMin={ethicsMin}
             setEthicsMin={setEthicsMin}
+            allCategories={allCategories}
           />
         }
         feed={feedContent}

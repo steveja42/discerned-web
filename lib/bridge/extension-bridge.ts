@@ -9,7 +9,8 @@ export type BridgeMessage =
   | { type: 'DISCERNED_BRIDGE_HELLO'; pubkey: string | null; authMethod: 'nip07' | 'nip46' | 'nsec' | 'guest' | null }
   | { type: 'DISCERNED_BRIDGE_CLIPS'; clips: ClipData[] }
   | { type: 'DISCERNED_BRIDGE_NEW_CLIP'; clip: ClipData }
-  | { type: 'DISCERNED_BRIDGE_FOCUS_CLIP'; clipId: string };
+  | { type: 'DISCERNED_BRIDGE_FOCUS_CLIP'; clipId: string }
+  | { type: 'DISCERNED_BRIDGE_CATEGORIES'; categories: string[] };
 
 export function listenForBridge(
   handler: (msg: BridgeMessage) => void,
@@ -34,4 +35,12 @@ export function sendDeleteClips(ids: string[]): void {
 
 export function sendUpdateNote(id: string, note: string): void {
   window.postMessage({ type: 'DISCERNED_UPDATE_NOTE', id, note }, window.location.origin);
+}
+
+export function sendImportClips(clips: ClipData[]): void {
+  window.postMessage({ type: 'DISCERNED_IMPORT_CLIPS', clips }, window.location.origin);
+}
+
+export function sendUpdateCategories(categories: string[]): void {
+  window.postMessage({ type: 'DISCERNED_UPDATE_CATEGORIES', categories }, window.location.origin);
 }
