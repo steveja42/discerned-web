@@ -77,7 +77,11 @@ export default function ClipRow({
         />
         <h3 className="clip-title">{capture.title}</h3>
         {(capture.selectionText || capture.bodyText) && (
-          <p className="clip-excerpt">{capture.selectionText ?? capture.bodyText}</p>
+          <p className="clip-excerpt">
+            {capture.selectionText
+              ? capture.selectionText.replace(/<[^>]*>/g, '')
+              : capture.bodyText}
+          </p>
         )}
         {capture.note && <div className="clip-note">{capture.note}</div>}
       </div>
