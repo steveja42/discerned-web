@@ -21,7 +21,8 @@ import LibraryEmpty from './LibraryEmpty';
 import BulkActionBar from './BulkActionBar';
 import ResizableLayout from '@/components/layout/ResizableLayout';
 import { ImportDialog } from './ImportDialog';
-import { exportClipsJson, exportClipsCsv } from '@/lib/export-utils';
+import { JsonImportDialog } from './JsonImportDialog';
+import { exportClipsJson } from '@/lib/export-utils';
 
 interface SidebarLocalProps {
   activeCat: string | null;
@@ -138,6 +139,7 @@ interface LibraryProps {
 export default function Library({ glyphVariant = 'bars', initialClipId }: LibraryProps) {
   const { bridgePresent, clips, timedOut, customCategories, removeClips, updateClipNote, addClips, addCustomCategories, focusClipId, clearFocusClipId } = useLibraryBridge();
   const [importOpen, setImportOpen] = useState(false);
+  const [jsonImportOpen, setJsonImportOpen] = useState(false);
 
   useEffect(() => {
     if (focusClipId) {
@@ -274,11 +276,10 @@ export default function Library({ glyphVariant = 'bars', initialClipId }: Librar
       />
 
       <div className="sov-strip">
-        <span className="item"><span className="ok-dot" />Local-first · IndexedDB</span>
         <span className="spacer" />
-        <span className="item"><a onClick={() => setImportOpen(true)} style={{ cursor: 'pointer' }}>Import</a></span>
+        <span className="item"><a onClick={() => setImportOpen(true)} style={{ cursor: 'pointer' }}>Import Evernote</a></span>
+        <span className="item"><a onClick={() => setJsonImportOpen(true)} style={{ cursor: 'pointer' }}>Import JSON</a></span>
         <span className="item"><a onClick={() => exportClipsJson(clips)} style={{ cursor: 'pointer' }}>Export JSON</a></span>
-        <span className="item"><a onClick={() => exportClipsCsv(clips)} style={{ cursor: 'pointer' }}>Export CSV</a></span>
       </div>
     </main>
   );
@@ -290,6 +291,15 @@ export default function Library({ glyphVariant = 'bars', initialClipId }: Librar
           bridgePresent={bridgePresent}
           existingCustomCategories={customCategories}
           onClose={() => setImportOpen(false)}
+          onClipsImported={addClips}
+          onCategoriesCreated={addCustomCategories}
+        />
+      )}
+      {jsonImportOpen && (
+        <JsonImportDialog
+          bridgePresent={bridgePresent}
+          existingCustomCategories={customCategories}
+          onClose={() => setJsonImportOpen(false)}
           onClipsImported={addClips}
           onCategoriesCreated={addCustomCategories}
         />
