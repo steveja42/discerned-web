@@ -98,7 +98,9 @@ export function parseEnex(xmlText: string, notebookName: string): ClipData[] {
   }
 
   const notes = Array.from(doc.querySelectorAll('note'));
-  const category = notebookName.trim() || 'General';
+  // Single-note exports don't represent a real notebook, so use General rather
+  // than creating a one-off category from the filename.
+  const category = notes.length === 1 ? 'General' : (notebookName.trim() || 'General');
 
   return notes.map((note): ClipData => {
     const title = getTextContent(note.querySelector('title')) || 'Untitled';
