@@ -369,6 +369,17 @@ a { color: inherit; }
 .nav-item.folder.add { font-weight: 400; }
 .nav-item.folder .icon-sm { flex-shrink: 0; }
 
+/* Folder action buttons (hover reveal) */
+.folder-delete,
+.folder-select-all {
+  display: none; background: none; border: none; cursor: pointer;
+  padding: 0 0.15rem; color: var(--ink-4); line-height: 0; flex-shrink: 0;
+}
+.nav-item:hover .folder-delete,
+.nav-item:hover .folder-select-all { display: flex; align-items: center; }
+.folder-delete:hover { color: oklch(0.45 0.18 25); }
+.folder-select-all:hover { color: var(--ink); }
+
 /* Main grid */
 .main {
   display: grid;
@@ -1371,6 +1382,17 @@ a { color: inherit; }
   transition: border-color 120ms;
 }
 .bulk-bar .btn-bulk-cancel:hover { border-color: oklch(0.65 0 0); }
+.bulk-bar .btn-bulk-export {
+  background: transparent;
+  color: oklch(0.85 0 0);
+  border: 1px solid oklch(0.45 0 0);
+  padding: 7px 12px;
+  border-radius: 5px;
+  font: inherit;
+  cursor: pointer;
+  transition: border-color 120ms;
+}
+.bulk-bar .btn-bulk-export:hover { border-color: oklch(0.65 0 0); color: var(--paper); }
 
 /* ── Detail panel — delete button ───────────────────────────────────────── */
 .detail-actions {

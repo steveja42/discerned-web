@@ -10,8 +10,9 @@ import { listenForBridge } from '@/lib/bridge/extension-bridge';
 
 export function useLibraryBridge() {
   const store = useClipStore();
-  const { clips, bridgePresent, pubkey, authMethod, timedOut, customCategories,
-          setClips, prependClip, addClips, addCustomCategories, setBridgePresent, setTimedOut,
+  const { clips, bridgePresent, pubkey, authMethod, timedOut, categories,
+          setClips, prependClip, addClips, setCategories, addCategories, removeCategory,
+          setBridgePresent, setTimedOut,
           removeClips, updateClipNote } = store;
 
   // Clip ID requested by the extension (e.g. "View in Library" after clipping).
@@ -37,7 +38,8 @@ export function useLibraryBridge() {
         setFocusClipId(msg.clipId);
       }
       if (msg.type === 'DISCERNED_BRIDGE_CATEGORIES') {
-        addCustomCategories(msg.categories);
+        // Bridge sends the authoritative full list — replace, don't merge.
+        setCategories(msg.categories);
       }
     }, mountClipCount.current);
 
@@ -50,5 +52,9 @@ export function useLibraryBridge() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return { bridgePresent, pubkey, authMethod, clips, timedOut, customCategories, removeClips, updateClipNote, addClips, addCustomCategories, focusClipId, clearFocusClipId: () => setFocusClipId(null) };
+  return {
+    bridgePresent, pubkey, authMethod, clips, timedOut, categories,
+    removeClips, updateClipNote, addClips, addCategories, removeCategory,
+    focusClipId, clearFocusClipId: () => setFocusClipId(null),
+  };
 }

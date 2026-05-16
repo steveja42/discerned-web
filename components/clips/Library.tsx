@@ -34,9 +34,11 @@ interface SidebarLocalProps {
   ethicsMin: number;
   setEthicsMin: (n: number) => void;
   allCategories: Record<string, { label: string; hue: number }>;
+  onDeleteCategory: (key: string) => void;
+  onSelectAllInCategory: (key: string) => void;
 }
 
-function SidebarLocal({ activeCat, setActiveCat, catCounts, totalCount, interestMin, setInterestMin, ethicsMin, setEthicsMin, allCategories }: SidebarLocalProps) {
+function SidebarLocal({ activeCat, setActiveCat, catCounts, totalCount, interestMin, setInterestMin, ethicsMin, setEthicsMin, allCategories, onDeleteCategory, onSelectAllInCategory }: SidebarLocalProps) {
   return (
     <aside className="sidebar">
       <div className="side-section-label" style={{ fontSize: '1.25rem', fontFamily: 'var(--serif)', fontStyle: 'italic', fontWeight: 700, letterSpacing: 0, textTransform: 'none', color: 'var(--ink)', marginBottom: '0.3rem' }}>Library</div>
@@ -72,6 +74,29 @@ function SidebarLocal({ activeCat, setActiveCat, catCounts, totalCount, interest
                 </svg>
                 <span style={{ flex: 1 }}>{cat.label}</span>
                 <span className="nav-count">{c}</span>
+                <button
+                  className="folder-select-all"
+                  onClick={(e) => { e.stopPropagation(); onSelectAllInCategory(key); }}
+                  title={`Select all in ${cat.label}`}
+                  aria-label={`Select all in ${cat.label}`}
+                >
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="12" height="12">
+                    <rect x="2" y="2" width="5" height="5" rx="1" />
+                    <rect x="9" y="2" width="5" height="5" rx="1" />
+                    <rect x="2" y="9" width="5" height="5" rx="1" />
+                    <path d="M9.5 11.5h5M12 9v5" />
+                  </svg>
+                </button>
+                <button
+                  className="folder-delete"
+                  onClick={(e) => { e.stopPropagation(); onDeleteCategory(key); }}
+                  title={`Delete ${cat.label} and its clips`}
+                  aria-label={`Delete ${cat.label}`}
+                >
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="12" height="12">
+                    <path d="M3 4h10M6 4V3h4v1M5 4l.5 9h5l.5-9" />
+                  </svg>
+                </button>
               </li>
             );
           })}
@@ -137,7 +162,7 @@ interface LibraryProps {
 }
 
 export default function Library({ glyphVariant = 'bars', initialClipId }: LibraryProps) {
-  const { bridgePresent, clips, timedOut, customCategories, removeClips, updateClipNote, addClips, addCustomCategories, focusClipId, clearFocusClipId } = useLibraryBridge();
+  const { bridgePresent, clips, timedOut, categories, removeClips, updateClipNote, addClips, addCategories, removeCategory, focusClipId, clearFocusClipId } = useLibraryBridge();
   const [importOpen, setImportOpen] = useState(false);
   const [jsonImportOpen, setJsonImportOpen] = useState(false);
 
@@ -170,13 +195,16 @@ export default function Library({ glyphVariant = 'bars', initialClipId }: Librar
     return m;
   }, [clips]);
 
+  // Build display map from the unified categories list sent by the bridge.
+  // Fall back to the CATEGORIES constant for hue/label if available; otherwise hash the name.
   const allCategories = useMemo(() => {
-    const custom: Record<string, { label: string; hue: number }> = {};
-    customCategories.forEach((cat) => {
-      custom[cat] = { label: cat, hue: categoryHue(cat) };
+    const map: Record<string, { label: string; hue: number }> = {};
+    categories.forEach((name) => {
+      const builtin = CATEGORIES[name as keyof typeof CATEGORIES];
+      map[name] = builtin ?? { label: name, hue: categoryHue(name) };
     });
-    return { ...CATEGORIES, ...custom };
-  }, [customCategories]);
+    return map;
+  }, [categories]);
 
   const showEmpty = timedOut && !bridgePresent;
 
@@ -237,9 +265,44 @@ export default function Library({ glyphVariant = 'bars', initialClipId }: Librar
     if (selectedId && selectedIds.has(selectedId)) setSelectedId(null);
   };
 
+  const handleBulkExport = () => {
+    const toExport = filtered.filter((c) => selectedIds.has(c.capture.id));
+    exportClipsJson(toExport);
+  };
+
   const handleSingleDelete = (id: string) => {
     removeClips([id]);
     if (selectedId === id) setSelectedId(null);
+  };
+
+  const handleDeleteCategory = (key: string) => {
+    const clipIds = clips.filter((c) => c.evaluation.category === key).map((c) => c.capture.id);
+    const catLabel = allCategories[key]?.label ?? key;
+    const clipWord = clipIds.length === 1 ? 'clip' : 'clips';
+    const msg = `Delete "${catLabel}" and its ${clipIds.length} ${clipWord}?\n\nThis cannot be undone.`;
+    if (!window.confirm(msg)) return;
+    removeCategory(key);
+    if (clipIds.length > 0) removeClips(clipIds);
+    if (activeCat === key) setActiveCat(null);
+    if (selectedId && clipIds.includes(selectedId)) setSelectedId(null);
+    setSelectedIds((prev) => {
+      if (clipIds.some((id) => prev.has(id))) {
+        const next = new Set(prev);
+        clipIds.forEach((id) => next.delete(id));
+        return next;
+      }
+      return prev;
+    });
+  };
+
+  const handleSelectAllInCategory = (key: string) => {
+    const ids = clips.filter((c) => c.evaluation.category === key).map((c) => c.capture.id);
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      ids.forEach((id) => next.add(id));
+      return next;
+    });
+    setActiveCat(key);
   };
 
   const feedContent = (
@@ -272,6 +335,7 @@ export default function Library({ glyphVariant = 'bars', initialClipId }: Librar
       <BulkActionBar
         count={selectedIds.size}
         onDelete={handleBulkDelete}
+        onExport={handleBulkExport}
         onClear={() => setSelectedIds(new Set())}
       />
 
@@ -289,19 +353,19 @@ export default function Library({ glyphVariant = 'bars', initialClipId }: Librar
       {importOpen && (
         <ImportDialog
           bridgePresent={bridgePresent}
-          existingCustomCategories={customCategories}
+          existingCustomCategories={categories}
           onClose={() => setImportOpen(false)}
           onClipsImported={addClips}
-          onCategoriesCreated={addCustomCategories}
+          onCategoriesCreated={addCategories}
         />
       )}
       {jsonImportOpen && (
         <JsonImportDialog
           bridgePresent={bridgePresent}
-          existingCustomCategories={customCategories}
+          existingCustomCategories={categories}
           onClose={() => setJsonImportOpen(false)}
           onClipsImported={addClips}
-          onCategoriesCreated={addCustomCategories}
+          onCategoriesCreated={addCategories}
         />
       )}
       <ResizableLayout
@@ -316,6 +380,8 @@ export default function Library({ glyphVariant = 'bars', initialClipId }: Librar
             ethicsMin={ethicsMin}
             setEthicsMin={setEthicsMin}
             allCategories={allCategories}
+            onDeleteCategory={handleDeleteCategory}
+            onSelectAllInCategory={handleSelectAllInCategory}
           />
         }
         feed={feedContent}

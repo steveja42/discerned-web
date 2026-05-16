@@ -2,8 +2,7 @@
 
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
 import type { ClipData } from '@/lib/types';
-import { CATEGORIES } from '@/lib/constants';
-import { sendDeleteClips, sendUpdateNote } from '@/lib/bridge/extension-bridge';
+import { sendDeleteClips, sendUpdateNote, sendUpdateCategories } from '@/lib/bridge/extension-bridge';
 
 interface ClipStoreState {
   clips: ClipData[];
@@ -11,7 +10,7 @@ interface ClipStoreState {
   pubkey: string | null;
   authMethod: string | null;
   timedOut: boolean;
-  customCategories: string[];
+  categories: string[];
 }
 
 interface ClipStoreActions {
@@ -22,7 +21,9 @@ interface ClipStoreActions {
   updateClipNote: (id: string, note: string) => void;
   setBridgePresent: (pubkey: string | null, authMethod: string | null) => void;
   setTimedOut: () => void;
-  addCustomCategories: (cats: string[]) => void;
+  setCategories: (cats: string[]) => void;
+  addCategories: (cats: string[]) => void;
+  removeCategory: (key: string) => void;
 }
 
 const ClipStoreContext = createContext<(ClipStoreState & ClipStoreActions) | null>(null);
@@ -34,7 +35,7 @@ export function ClipStoreProvider({ children }: { children: ReactNode }) {
     pubkey: null,
     authMethod: null,
     timedOut: false,
-    customCategories: [],
+    categories: [],
   });
 
   const setClips = useCallback((clips: ClipData[]) => {
@@ -57,15 +58,26 @@ export function ClipStoreProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  const addCustomCategories = useCallback((cats: string[]) => {
+  // Replace the full categories list (used when bridge sends its authoritative list).
+  const setCategories = useCallback((cats: string[]) => {
+    setState((s) => ({ ...s, categories: cats }));
+  }, []);
+
+  // Merge new category names into the list (used by import dialogs).
+  const addCategories = useCallback((cats: string[]) => {
     setState((s) => {
-      const builtinKeys = new Set(Object.keys(CATEGORIES).map((k) => k.toLowerCase()));
-      const existingCustom = new Set(s.customCategories.map((c) => c.toLowerCase()));
-      const toAdd = cats.filter(
-        (c) => c.trim() && !builtinKeys.has(c.trim().toLowerCase()) && !existingCustom.has(c.trim().toLowerCase()),
-      );
+      const existing = new Set(s.categories.map((c) => c.toLowerCase()));
+      const toAdd = cats.filter((c) => c.trim() && !existing.has(c.trim().toLowerCase()));
       if (toAdd.length === 0) return s;
-      return { ...s, customCategories: [...s.customCategories, ...toAdd.map((c) => c.trim())] };
+      return { ...s, categories: [...s.categories, ...toAdd.map((c) => c.trim())] };
+    });
+  }, []);
+
+  const removeCategory = useCallback((key: string) => {
+    setState((s) => {
+      const updated = s.categories.filter((c) => c.toLowerCase() !== key.toLowerCase());
+      sendUpdateCategories(updated);
+      return { ...s, categories: updated };
     });
   }, []);
 
@@ -96,7 +108,7 @@ export function ClipStoreProvider({ children }: { children: ReactNode }) {
 
   return (
     <ClipStoreContext.Provider
-      value={{ ...state, setClips, prependClip, addClips, removeClips, updateClipNote, setBridgePresent, setTimedOut, addCustomCategories }}
+      value={{ ...state, setClips, prependClip, addClips, removeClips, updateClipNote, setBridgePresent, setTimedOut, setCategories, addCategories, removeCategory }}
     >
       {children}
     </ClipStoreContext.Provider>

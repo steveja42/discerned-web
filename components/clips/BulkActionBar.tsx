@@ -3,10 +3,11 @@
 interface BulkActionBarProps {
   count: number;
   onDelete: () => void;
+  onExport: () => void;
   onClear: () => void;
 }
 
-export default function BulkActionBar({ count, onDelete, onClear }: BulkActionBarProps) {
+export default function BulkActionBar({ count, onDelete, onExport, onClear }: BulkActionBarProps) {
   return (
     <div className={`bulk-bar${count > 0 ? ' visible' : ''}`} aria-hidden={count === 0}>
       <span className="bulk-count">
@@ -14,6 +15,9 @@ export default function BulkActionBar({ count, onDelete, onClear }: BulkActionBa
       </span>
       <button className="btn-bulk-cancel" onClick={onClear}>
         Cancel
+      </button>
+      <button className="btn-bulk-export" onClick={onExport}>
+        Export {count}
       </button>
       <button className="btn-bulk-delete" onClick={onDelete}>
         Delete {count}
