@@ -6,6 +6,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useRef, useEffect } from 'react';
 import MiniBeacon from '@/components/brand/MiniBeacon';
 import StatusDot from '@/components/auth/StatusDot';
 import type { AuthState } from '@/lib/types';
@@ -16,6 +17,8 @@ interface TopBarProps {
   brandHasPopover?: boolean;
   onBrandClick?: () => void;
   searchPlaceholder?: string;
+  searchValue?: string;
+  onSearchChange?: (q: string) => void;
   extensionPresent?: boolean;
 }
 
@@ -44,8 +47,28 @@ function SearchIcon() {
   );
 }
 
-export default function TopBar({ auth, onSignIn, brandHasPopover, onBrandClick, searchPlaceholder, extensionPresent }: TopBarProps) {
+export default function TopBar({ auth, onSignIn, brandHasPopover, onBrandClick, searchPlaceholder, searchValue, onSearchChange, extensionPresent }: TopBarProps) {
   const path = usePathname();
+  const searchRef = useRef<HTMLInputElement>(null);
+  const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform);
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const isTrigger = isMac ? e.metaKey && e.key === 'k' : e.ctrlKey && e.key === 'k';
+      if (!isTrigger) return;
+      e.preventDefault();
+      const el = searchRef.current;
+      if (!el) return;
+      if (document.activeElement === el) {
+        el.select();
+      } else {
+        el.focus();
+      }
+    };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [isMac]);
+
   const navLink = (href: string, label: string) => (
     <Link href={href} className={`topbar-link ${path === href ? 'topbar-link-active' : ''}`}>{label}</Link>
   );
@@ -67,8 +90,13 @@ export default function TopBar({ auth, onSignIn, brandHasPopover, onBrandClick, 
 
       <div className="search">
         <SearchIcon />
-        <input placeholder={searchPlaceholder ?? 'Search clips, casters, sources…'} />
-        <kbd>⌘K</kbd>
+        <input
+          ref={searchRef}
+          placeholder={searchPlaceholder ?? 'Search clips, casters, sources…'}
+          value={searchValue ?? ''}
+          onChange={(e) => onSearchChange?.(e.target.value)}
+        />
+        <kbd>{isMac ? '⌘K' : 'Ctrl+K'}</kbd>
       </div>
 
       <div className="topbar-right">

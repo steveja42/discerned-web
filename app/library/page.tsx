@@ -8,7 +8,7 @@ import SignInModal from '@/components/auth/SignInModal';
 import { useNostrAuth } from '@/hooks/useNostrAuth';
 import { useBridgeAuth } from '@/hooks/useBridgeAuth';
 
-function LibraryWithClipId() {
+function LibraryWithClipId({ searchQuery }: { searchQuery: string }) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const initialClipId = searchParams.get('clip') ?? undefined;
@@ -22,7 +22,7 @@ function LibraryWithClipId() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return <Library initialClipId={initialClipId} />;
+  return <Library initialClipId={initialClipId} searchQuery={searchQuery} />;
 }
 
 export default function LibraryPage() {
@@ -30,6 +30,7 @@ export default function LibraryPage() {
   const { auth, signInPubkey } = useNostrAuth();
   const { extensionPresent } = useBridgeAuth();
   const [signInOpen, setSignInOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   return (
     <div>
@@ -38,10 +39,12 @@ export default function LibraryPage() {
         onSignIn={() => setSignInOpen(true)}
         onBrandClick={() => router.push('/')}
         searchPlaceholder="Search your clips…"
+        searchValue={searchQuery}
+        onSearchChange={setSearchQuery}
         extensionPresent={extensionPresent}
       />
       <Suspense fallback={<Library />}>
-        <LibraryWithClipId />
+        <LibraryWithClipId searchQuery={searchQuery} />
       </Suspense>
       {signInOpen && (
         <SignInModal

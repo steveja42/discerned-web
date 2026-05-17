@@ -159,9 +159,10 @@ function SidebarLocal({ activeCat, setActiveCat, catCounts, totalCount, interest
 interface LibraryProps {
   glyphVariant?: GlyphVariant;
   initialClipId?: string;
+  searchQuery?: string;
 }
 
-export default function Library({ glyphVariant = 'bars', initialClipId }: LibraryProps) {
+export default function Library({ glyphVariant = 'bars', initialClipId, searchQuery }: LibraryProps) {
   const { bridgePresent, clips, timedOut, categories, removeClips, updateClipNote, addClips, addCategories, removeCategory, focusClipId, clearFocusClipId } = useLibraryBridge();
   const [importOpen, setImportOpen] = useState(false);
   const [jsonImportOpen, setJsonImportOpen] = useState(false);
@@ -181,13 +182,27 @@ export default function Library({ glyphVariant = 'bars', initialClipId }: Librar
   const [selectedId, setSelectedId] = useState<string | null>(initialClipId ?? null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
+  const q = searchQuery?.trim().toLowerCase() ?? '';
+
   const filtered = useMemo(() =>
-    clips.filter((c) =>
-      (!activeCat || c.evaluation.category === activeCat) &&
-      interestRank(c.evaluation.interest) + 1 >= interestMin &&
-      ethicsRank(c.evaluation.ethics) + 1 >= ethicsMin,
-    ),
-    [clips, activeCat, interestMin, ethicsMin],
+    clips.filter((c) => {
+      if (activeCat && c.evaluation.category !== activeCat) return false;
+      if (interestRank(c.evaluation.interest) + 1 < interestMin) return false;
+      if (ethicsRank(c.evaluation.ethics) + 1 < ethicsMin) return false;
+      if (q) {
+        const hay = [
+          c.capture.title,
+          c.capture.selectionText,
+          c.capture.selectionContext,
+          c.capture.bodyText,
+          c.capture.note,
+          c.capture.url,
+        ].filter(Boolean).join(' ').toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      return true;
+    }),
+    [clips, activeCat, interestMin, ethicsMin, q],
   );
 
   const selected = filtered.find((c) => c.capture.id === selectedId) ?? filtered[0] ?? null;
@@ -316,7 +331,7 @@ export default function Library({ glyphVariant = 'bars', initialClipId }: Librar
         ) : !bridgePresent ? (
           <div className="feed-empty">Waiting for extension…</div>
         ) : filtered.length === 0 ? (
-          <div className="feed-empty">No clips match these filters.</div>
+          <div className="feed-empty">{q ? `No clips match "${searchQuery}".` : 'No clips match these filters.'}</div>
         ) : (
           <div className="feed-list">
             {filtered.map((clip, i) => (
