@@ -1,26 +1,10 @@
 import { CATEGORIES, interestRank, ethicsRank } from '@/lib/constants';
-import { interestColor, ethicsColor } from '@/lib/dimensionColor';
+import Wedge from './Wedge';
 
 interface GlyphBarsProps {
   interest: string;
   ethics: string;
   category: string;
-}
-
-type ColorFn = (rank: number, neutralRank: number, maxRank: number) => string;
-
-function Bars({ rank, neutralRank, max, colorFn }: { rank: number; neutralRank: number; max: number; colorFn: ColorFn }) {
-  return (
-    <div className="bars">
-      {Array.from({ length: max }).map((_, i) => (
-        <div
-          key={i}
-          className="bar"
-          style={i === rank ? { background: colorFn(rank, neutralRank, max - 1) } : undefined}
-        />
-      ))}
-    </div>
-  );
 }
 
 export default function GlyphBars({ interest, ethics, category }: GlyphBarsProps) {
@@ -38,15 +22,15 @@ export default function GlyphBars({ interest, ethics, category }: GlyphBarsProps
       {!iNeutral && (
         <div className="glyph-row" title={`Interest: ${interest}`}>
           <span className="axis-key">I</span>
-          <Bars rank={iRank} neutralRank={1} max={5} colorFn={interestColor} />
-          <span style={{ marginLeft: 4, color: interestColor(iRank, 1, 4), fontSize: 10 }}>{interest}</span>
+          <Wedge kind="interest" label={interest} />
+          <span className="dim-label">{interest}</span>
         </div>
       )}
       {!eNeutral && (
         <div className="glyph-row" title={`Ethics: ${ethics}`}>
           <span className="axis-key">E</span>
-          <Bars rank={eRank} neutralRank={2} max={5} colorFn={ethicsColor} />
-          <span style={{ marginLeft: 4, color: ethicsColor(eRank, 2, 4), fontSize: 10 }}>{ethics}</span>
+          <Wedge kind="ethics" label={ethics} />
+          <span className="dim-label">{ethics}</span>
         </div>
       )}
     </div>

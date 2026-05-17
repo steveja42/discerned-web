@@ -5,8 +5,8 @@
 
 import { useState, useEffect } from 'react';
 import type { ClipData } from '@/lib/types';
-import { CATEGORIES, INTEREST_LEVELS, ETHICS_LEVELS, interestRank, ethicsRank } from '@/lib/constants';
-import { interestColor, ethicsColor } from '@/lib/dimensionColor';
+import { CATEGORIES, interestRank, ethicsRank } from '@/lib/constants';
+import Wedge from '@/components/glyph/Wedge';
 
 interface DetailPanelProps {
   clip: ClipData | null;
@@ -181,15 +181,8 @@ export default function DetailPanel({ clip, onDelete, onUpdateNote }: DetailPane
           <div className="axis-display">
             {!iNeutral && (
               <div className="axis-large">
-                <div className="axis-name">
-                  Interest
-                  <small>{INTEREST_LEVELS[0]} → {INTEREST_LEVELS[4]}</small>
-                </div>
-                <div className="axis-track">
-                  {INTEREST_LEVELS.map((lvl, i) => (
-                    <div key={lvl} className={`seg ${i <= iIdx ? 'on interest' : ''}`} title={lvl} style={i === iIdx ? { background: interestColor(i, 1, 4) } : undefined} />
-                  ))}
-                </div>
+                <div className="axis-name">Interest</div>
+                <Wedge kind="interest" label={evaluation.interest} />
                 <div className="axis-num" style={{ fontSize: 11, fontFamily: 'var(--mono)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                   {evaluation.interest}
                 </div>
@@ -197,15 +190,8 @@ export default function DetailPanel({ clip, onDelete, onUpdateNote }: DetailPane
             )}
             {!eNeutral && (
               <div className="axis-large">
-                <div className="axis-name">
-                  Ethics
-                  <small>{ETHICS_LEVELS[0]} → {ETHICS_LEVELS[4]}</small>
-                </div>
-                <div className="axis-track">
-                  {ETHICS_LEVELS.map((lvl, i) => (
-                    <div key={lvl} className={`seg ${i <= eIdx ? 'on ethics' : ''}`} title={lvl} style={i === eIdx ? { background: ethicsColor(i, 2, 4) } : undefined} />
-                  ))}
-                </div>
+                <div className="axis-name">Ethics</div>
+                <Wedge kind="ethics" label={evaluation.ethics} />
                 <div className="axis-num" style={{ fontSize: 11, fontFamily: 'var(--mono)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                   {evaluation.ethics}
                 </div>

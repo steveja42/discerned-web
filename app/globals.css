@@ -16,6 +16,7 @@
   --interest: oklch(0.62 0.12 65);
   --ethics:   oklch(0.55 0.10 155);
   --category: oklch(0.50 0.08 270);
+  --neutral-faded: oklch(0.78 0.01 80 / 0.55);
   --shadow-page: 0 1px 0 rgba(26,23,20,0.04), 0 24px 48px -24px rgba(26,23,20,0.18);
   --shadow-pop: 0 1px 0 rgba(26,23,20,0.04), 0 18px 36px -12px rgba(26,23,20,0.22);
   --serif: 'Newsreader', 'Iowan Old Style', Georgia, serif;
@@ -813,6 +814,14 @@ a { color: inherit; }
 .glyph-row .axis-key {
   width: 10px; text-transform: uppercase;
   color: var(--ink-4);
+}
+.glyph-row .dim-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink-3);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-left: 4px;
 }
 .bars {
   display: flex; gap: 2px;
