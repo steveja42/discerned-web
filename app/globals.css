@@ -1071,20 +1071,59 @@ a { color: inherit; }
 .clip-body img[width="16"], .clip-body img[width="20"], .clip-body img[width="24"] {
   border-radius: 0 !important;
 }
-.clip-body a:has(> img) + a {
+/* :has(img) (not just direct child) catches the common pattern
+   <a><span><img></span></a> where the avatar img is wrapped in a span. */
+.clip-body a:has(img) {
+  margin-right: 6px;
+}
+.clip-body a:has(img) + a {
   font-family: var(--sans);
   font-weight: 600;
   color: var(--ink);
   text-decoration: none;
+  margin-right: 8px;
 }
-.clip-body a:has(> img) + a:hover {
+.clip-body a:has(img) + a:hover {
   text-decoration: underline;
 }
-.clip-body a:has(> img) ~ a:nth-of-type(3) {
+.clip-body a:has(img) ~ a:nth-of-type(3) {
   font-family: var(--sans);
   font-size: 13px;
   color: var(--ink-3);
   text-decoration: none;
+}
+/* Preserve intentional newlines in any <span> inside .clip-body. pre-line
+   still collapses runs of regular whitespace, so spans that don't contain
+   \n are unaffected. The only behavioural change is making explicit \n
+   characters render as line breaks instead of getting collapsed. */
+.clip-body span {
+  white-space: pre-line;
+}
+/* Sanitised <hr> elements often originate as Chakra/Material vertical
+   dividers between action buttons. The default block-level rendering
+   forces a line break, splitting a row of icons across multiple lines.
+   Make them small inline vertical bars instead. */
+.clip-body hr {
+  display: inline-block;
+  width: 1px;
+  height: 1em;
+  vertical-align: middle;
+  border: none;
+  background: var(--rule);
+  margin: 0 6px;
+}
+/* A <div> whose immediate content includes an inline SVG is almost always
+   an action button row, badge row, or icon group from a modern UI. Render
+   it as inline-flex so the icons stay together as a group and adjacent
+   groups flow on the same line until the column genuinely runs out of
+   space. */
+.clip-body div:has(> svg),
+.clip-body div:has(> a > svg) {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: 12px;
+  vertical-align: middle;
 }
 .detail-thumb {
   width: 100%;
