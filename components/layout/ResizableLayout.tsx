@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useCallback, useState, type ReactNode } from 'react';
+import { useRef, useCallback, useState, useEffect, type ReactNode } from 'react';
 
 interface ResizableLayoutProps {
   sidebar: ReactNode;
@@ -14,6 +14,7 @@ const MIN_SIDEBAR = 160;
 const MAX_SIDEBAR = 400;
 const MIN_FEED = 280;
 const MIN_DETAIL = 260;
+const STACK_BREAKPOINT = 900;
 
 export default function ResizableLayout({
   sidebar,
@@ -25,7 +26,16 @@ export default function ResizableLayout({
   const [sidebarW, setSidebarW] = useState(initialSidebarWidth);
   // null = use CSS fr-based default; number = user has dragged, use px
   const [detailW, setDetailW] = useState<number | null>(null);
+  const [stacked, setStacked] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const mq = window.matchMedia(`(max-width: ${STACK_BREAKPOINT}px)`);
+    setStacked(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setStacked(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
 
   const startDrag = useCallback(
     (
@@ -80,29 +90,47 @@ export default function ResizableLayout({
     [startDrag, sidebarW],
   );
 
-  // When detailW is null, rely on CSS fr units (defined in .main) for the
-  // detail column — no JS sizing, no flash. Once the user drags, switch to px.
-  const columns = showDetail
-    ? detailW !== null
-      ? `${sidebarW}px 4px 1fr 4px ${detailW}px`
-      : `${sidebarW}px 4px 1fr 4px 1.4fr`
-    : `${sidebarW}px 4px 1fr`;
+  let gridStyle: React.CSSProperties;
+  if (stacked) {
+    // 2-column: [sidebar + feed pane] | resizer | detail
+    const rightCol = showDetail
+      ? detailW !== null ? `${detailW}px` : `1fr`
+      : `0px`;
+    gridStyle = {
+      gridTemplateColumns: showDetail ? `1fr 4px ${rightCol}` : `1fr`,
+    };
+  } else {
+    // Single row, all columns
+    const cols = showDetail
+      ? detailW !== null
+        ? `${sidebarW}px 4px 1fr 4px ${detailW}px`
+        : `${sidebarW}px 4px 1fr 4px 1.4fr`
+      : `${sidebarW}px 4px 1fr`;
+    gridStyle = { gridTemplateColumns: cols };
+  }
 
   return (
     <div
       ref={containerRef}
-      className="main resizable-main"
-      style={{ gridTemplateColumns: columns }}
+      className={`main resizable-main${stacked ? ' main--stacked' : ''}`}
+      style={gridStyle}
     >
-      {sidebar}
-
-      <div
-        className="col-resizer"
-        onMouseDown={dragSidebar}
-        title="Drag to resize"
-      />
-
-      {feed}
+      {stacked ? (
+        <div className="left-pane">
+          {sidebar}
+          {feed}
+        </div>
+      ) : (
+        <>
+          {sidebar}
+          <div
+            className="col-resizer"
+            onMouseDown={dragSidebar}
+            title="Drag to resize"
+          />
+          {feed}
+        </>
+      )}
 
       {showDetail && (
         <>
