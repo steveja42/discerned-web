@@ -416,6 +416,8 @@ a { color: inherit; }
 .left-pane {
   display: flex;
   flex-direction: column;
+  min-height: 0;
+  height: 100%;
   overflow: hidden;
   border-right: 1px solid var(--rule);
 }
@@ -423,11 +425,11 @@ a { color: inherit; }
   border-right: none;
   border-bottom: 1px solid var(--rule);
   flex-shrink: 0;
+  max-height: 40%;
 }
 .left-pane .feed-col {
   flex: 1;
   height: auto;
-  overflow-y: auto;
   min-height: 0;
 }
 
