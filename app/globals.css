@@ -1045,6 +1045,47 @@ a { color: inherit; }
 .clip-body blockquote { border-left: 3px solid var(--rule); padding-left: 12px; margin: 0 0 1em; color: #3a342c; }
 .clip-body pre, .clip-body code { font-family: ui-monospace, monospace; font-size: 13px; background: var(--paper-2); border-radius: 3px; padding: 1px 4px; }
 .clip-body pre { padding: 12px 14px; overflow-x: auto; }
+
+/* Generic fallbacks for captured articles from arbitrary sites — these run on
+   any .clip-body content. The X.com .tweet-* rules above take precedence on
+   tweet captures because the extractor adds those classes; nothing here
+   conflicts. The capture pipeline writes rendered width/height attributes to
+   every <img>, so width-based selectors are reliable signals. */
+.clip-body svg {
+  display: inline-block;
+  vertical-align: middle;
+  width: 1em;
+  height: 1em;
+  fill: currentColor;
+  stroke: currentColor;
+  flex-shrink: 0;
+}
+.clip-body img[width="16"], .clip-body img[width="20"], .clip-body img[width="24"],
+.clip-body img[width="28"], .clip-body img[width="32"], .clip-body img[width="40"],
+.clip-body img[width="48"], .clip-body img[width="56"], .clip-body img[width="64"] {
+  display: inline-block !important;
+  margin: 0 4px 0 0 !important;
+  vertical-align: middle;
+  border-radius: 50%;
+}
+.clip-body img[width="16"], .clip-body img[width="20"], .clip-body img[width="24"] {
+  border-radius: 0 !important;
+}
+.clip-body a:has(> img) + a {
+  font-family: var(--sans);
+  font-weight: 600;
+  color: var(--ink);
+  text-decoration: none;
+}
+.clip-body a:has(> img) + a:hover {
+  text-decoration: underline;
+}
+.clip-body a:has(> img) ~ a:nth-of-type(3) {
+  font-family: var(--sans);
+  font-size: 13px;
+  color: var(--ink-3);
+  text-decoration: none;
+}
 .detail-thumb {
   width: 100%;
   max-height: 220px;
